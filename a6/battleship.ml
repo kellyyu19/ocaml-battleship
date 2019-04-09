@@ -1,6 +1,7 @@
 type coordinate = char * int 
 type status = Occupied | Hit | Empty  
 type point = coordinate * status
+type grid = point list 
 
 type name = Carrier | Battleship | Cruiser | Submarine | Destroyer  
 type ship = {name: name; size: int }
