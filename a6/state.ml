@@ -1,5 +1,6 @@
 open Battleship
 
+type state = {ship}
 let rec make_new_int_list (r:char) (c:int list) (c1:int) (c2:int) outlist = 
   match c with 
   |[] -> outlist
@@ -12,7 +13,7 @@ let rec make_new_char_list (r:char list) (c:int) (r1:char) (r2:char) outlist =
   |h::t when h>=r1 && h<=r2 -> make_new_char_list t c r1 r2 ((h,c)::outlist)
   |h::t -> outlist
 
-let rec make_grid ship ship_coords grid (outlist: Battleship.grid) : grid = 
+let rec make_grid ship ship_coords grid (outlist: grid) : grid = 
   match grid with 
   | [] -> outlist
   | ((r,c),state)::t when state=Empty -> if (List.mem (r,c) ship_coords) 
@@ -35,3 +36,9 @@ let place (ship:ship) (coordOne:coordinate) (coordTwo:coordinate) (grid:grid) =
     let coords = make_new_int_list (fst coordOne) columns (snd coordOne) (snd coordTwo) [] in 
     make_grid ship coords grid []
   else raise (Failure "Invalid Coords")
+
+let rec fire (coord: coordinate) (grid:grid) (outlist:grid) =
+  match grid with 
+  | [] -> outlist
+  | ((r,c),Occupied(s))::t when (r,c)=coord -> fire coord grid ((r,c),Hit)::outlist)
+| (())
