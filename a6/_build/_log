@@ -1,16 +1,23 @@
 ### Starting build.
-# Target: battleship.ml.depends, tags: { extension:ml, file:battleship.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules battleship.ml > battleship.ml.depends
-# Target: battleship.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:battleship.cmo, file:battleship.ml, implem, ocaml, quiet }
-ocamlfind ocamlc -c -o battleship.cmo battleship.ml
-# Target: command.ml.depends, tags: { extension:ml, file:command.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules command.ml > command.ml.depends
-# Target: command.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:command.cmo, file:command.ml, implem, ocaml, quiet }
-ocamlfind ocamlc -c -o command.cmo command.ml
-# Target: state.ml.depends, tags: { extension:ml, file:state.ml, ocaml, ocamldep, quiet }
-ocamlfind ocamldep -modules state.ml > state.ml.depends
-+ ocamlfind ocamldep -modules state.ml > state.ml.depends
-File "state.ml", line 29, characters 83-84:
-Error: Syntax error
+# Target: battleship.ml.depends, tags: { package(ANSITerminal), package(oUnit), package(yojson), extension:ml, file:battleship.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package oUnit -package yojson -package ANSITerminal -modules battleship.ml > battleship.ml.depends # cached
+# Target: battleship.cmo, tags: { package(ANSITerminal), package(oUnit), package(yojson), byte, compile, extension:cmo, extension:ml, file:battleship.cmo, file:battleship.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package oUnit -package yojson -package ANSITerminal -o battleship.cmo battleship.ml # cached
+# Target: command.ml.depends, tags: { package(ANSITerminal), package(oUnit), package(yojson), extension:ml, file:command.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package oUnit -package yojson -package ANSITerminal -modules command.ml > command.ml.depends # cached
+# Target: command.cmo, tags: { package(ANSITerminal), package(oUnit), package(yojson), byte, compile, extension:cmo, extension:ml, file:command.cmo, file:command.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package oUnit -package yojson -package ANSITerminal -o command.cmo command.ml # cached
+# Target: state.ml.depends, tags: { package(ANSITerminal), package(oUnit), package(yojson), extension:ml, file:state.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package oUnit -package yojson -package ANSITerminal -modules state.ml > state.ml.depends
+# Target: state.cmo, tags: { package(ANSITerminal), package(oUnit), package(yojson), byte, compile, extension:cmo, extension:ml, file:state.cmo, file:state.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package oUnit -package yojson -package ANSITerminal -o state.cmo state.ml
++ ocamlfind ocamlc -c -package oUnit -package yojson -package ANSITerminal -o state.cmo state.ml
+File "state.ml", line 60, characters 42-50:
+Error: This expression has type Battleship.grid = Battleship.point list
+       but an expression was expected of type
+         (Battleship.coordinate * Battleship.ship) list
+       Type Battleship.point = Battleship.coordinate * Battleship.status
+       is not compatible with type Battleship.coordinate * Battleship.ship 
+       Type Battleship.status is not compatible with type Battleship.ship 
 Command exited with code 2.
 # Compilation unsuccessful.

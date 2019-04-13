@@ -1,5 +1,5 @@
 type entry_phrase = string list
-type command = Start | Fire of entry_phrase | Quit
+type command = Start | Fire of entry_phrase | Quit | Status
 exception Empty 
 exception Malformed 
 
@@ -18,6 +18,7 @@ let parseHelper (entry:entry_phrase) : command =
     | "start" -> if t=[] then Start else raise Malformed
     | "fire"  -> if t=[] then raise Malformed else Fire t
     | "quit"  -> if t=[] then Quit else raise Malformed 
+    | "status" -> if t=[] then Status else raise Malformed
     | _ -> raise Malformed
 
 (** [parse] is the command corresponding to the given string of user input. *)
