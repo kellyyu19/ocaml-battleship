@@ -25,14 +25,25 @@ let place (ship:ship) (coordOne:coordinate) (coordTwo:coordinate) (state:state) 
     {ship_list=init_ships; current_grid = Battleship.make_grid ship coords state.current_grid []}
   else raise (Failure "Invalid Coords")
 
-let rec fire (coord: coordinate) (currentState: state) (newState:state) =
-  match currentState.current_grid with 
-  | [] -> newState
-  | ((r,c),Occupied(s))::t when (r,c)=coord -> 
-    let rec new_ship_list currentList outlist : ship list= match currentList with 
-      | [] -> outlist
-      | h::t when h=s -> new_ship_list t ({name=s.name; size=s.size; hits=s.hits+1}::outlist)
-      | h::t -> new_ship_list t (h::outlist)
+let rec new_ship_list ship ship_list outlist : ship list= 
+  match ship_list with 
+  | [] -> outlist
+  | h::t when h=ship -> new_ship_list ship t ({name=ship.name; 
+                                               size=ship.size; hits=ship.hits+1}::outlist)
+  | h::t -> new_ship_list ship t (h::outlist) 
 
-                  fire coord currentState ((r,c),Hit)::outlist)
-| ((r,c),s)::t when s
+let rec update_grid coord currentGrid outlist = 
+  match currentGrid with 
+  | [] -> outlist
+  | ((r,c),s)::t when (r,c) = coord -> update_grid coord t ((r,c),Hit)::outlist)
+| h::t -> update_grid coord t h::outlist
+
+
+let fire (coord: coordinate) (currentState: state) =
+  match currentState.current_grid with 
+  | [] -> 
+  | ((r,c),Occupied(s))::t when (r,c)=coord -> 
+    let update_ship_list = new_ship_list s currentState.ship_list [] in 
+    let update_grid = update_grid coord currentState.current_grid [] in 
+    {ship_list=update_ship_list; current_grid=update_grid}
+  | ((r,c),s)::t -> {ship_list=currentState.ship_list; current_grid=update_grid}
