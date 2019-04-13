@@ -35,15 +35,15 @@ let rec new_ship_list ship ship_list outlist : ship list=
 let rec update_grid coord currentGrid outlist = 
   match currentGrid with 
   | [] -> outlist
-  | ((r,c),s)::t when (r,c) = coord -> update_grid coord t ((r,c),Hit)::outlist)
-| h::t -> update_grid coord t h::outlist
+  | ((r,c),s)::t  -> if (r,c) = coord then update_grid coord t (((r,c),Hit)::outlist)
+    else update_grid coord t outlist
 
 
-let fire (coord: coordinate) (currentState: state) =
+let rec fire (coord: coordinate) (currentState: state) =
   match currentState.current_grid with 
-  | [] -> 
+  | [] -> currentState
   | ((r,c),Occupied(s))::t when (r,c)=coord -> 
     let update_ship_list = new_ship_list s currentState.ship_list [] in 
     let update_grid = update_grid coord currentState.current_grid [] in 
     {ship_list=update_ship_list; current_grid=update_grid}
-  | ((r,c),s)::t -> {ship_list=currentState.ship_list; current_grid=update_grid}
+  | ((r,c),s)::t -> fire coord 
