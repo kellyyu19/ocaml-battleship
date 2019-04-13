@@ -1,25 +1,11 @@
 open Battleship
+let carrier = {name = Carrier; size = 5; hits = 0}
+let battleship = {name = Battleship; size = 4; hits = 0}
+let cruiser = {name = Cruiser; size = 3; hits = 0}
+let submarine = {name = Submarine; size = 3; hits = 0}
+let destroyer = {name = Destroyer; size = 2; hits = 0}
+type state = {ship_list: ship list; current_grid: grid}
 
-type state = {ship}
-let rec make_new_int_list (r:char) (c:int list) (c1:int) (c2:int) outlist = 
-  match c with 
-  |[] -> outlist
-  |h::t when h>=c1 && h<=c2 -> make_new_int_list r t c1 c2 ((r,h)::outlist)
-  |h::t -> outlist
-
-let rec make_new_char_list (r:char list) (c:int) (r1:char) (r2:char) outlist = 
-  match r with 
-  |[] -> outlist
-  |h::t when h>=r1 && h<=r2 -> make_new_char_list t c r1 r2 ((h,c)::outlist)
-  |h::t -> outlist
-
-let rec make_grid ship ship_coords grid (outlist: grid) : grid = 
-  match grid with 
-  | [] -> outlist
-  | ((r,c),state)::t when state=Empty -> if (List.mem (r,c) ship_coords) 
-    then make_grid ship ship_coords t (((r,c),Occupied(ship))::outlist)
-    else raise(Failure "This coordinate is not in the grid")
-  | _ -> raise(Failure "A ship is already placed here")
 
 
 let place (ship:ship) (coordOne:coordinate) (coordTwo:coordinate) (grid:grid) = 
@@ -29,16 +15,16 @@ let place (ship:ship) (coordOne:coordinate) (coordTwo:coordinate) (grid:grid) =
   else if (snd coordOne = snd coordTwo && Pervasives.abs (Char.code (fst coordOne) 
                                                           - Char.code(fst coordTwo)) = ship.size ) 
   then 
-    let coords = make_new_char_list rows (snd coordOne) (fst coordOne) (fst coordTwo) [] in 
-    make_grid ship coords grid []
+    let coords = Battleship.make_new_char_list rows (snd coordOne) (fst coordOne) (fst coordTwo) [] in 
+    Battleship.make_grid ship coords grid []
   else if (fst coordOne = fst coordTwo && Pervasives.abs (snd coordOne - snd coordTwo) = ship.size)
   then 
-    let coords = make_new_int_list (fst coordOne) columns (snd coordOne) (snd coordTwo) [] in 
-    make_grid ship coords grid []
+    let coords = Battleship.make_new_int_list (fst coordOne) columns (snd coordOne) (snd coordTwo) [] in 
+    Battleship.make_grid ship coords grid []
   else raise (Failure "Invalid Coords")
 
 let rec fire (coord: coordinate) (grid:grid) (outlist:grid) =
   match grid with 
   | [] -> outlist
   | ((r,c),Occupied(s))::t when (r,c)=coord -> fire coord grid ((r,c),Hit)::outlist)
-| (())
+| 
