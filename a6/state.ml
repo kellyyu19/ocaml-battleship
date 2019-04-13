@@ -1,12 +1,14 @@
 open Battleship
-let carrier = {name = Carrier; size = 5; hits = 0}
-let battleship = {name = Battleship; size = 4; hits = 0}
-let cruiser = {name = Cruiser; size = 3; hits = 0}
-let submarine = {name = Submarine; size = 3; hits = 0}
-let destroyer = {name = Destroyer; size = 2; hits = 0}
+
 type state = {ship_list: ship list; current_grid: grid}
 
+let init_ships = 
+  [{name = Battleship; size = 4; hits = 0}; {name = Cruiser; size = 3; hits = 0}; 
+   {name = Submarine; size = 3; hits = 0}; {name = Destroyer; size = 2; hits = 0};
+   {name = Destroyer; size = 2; hits = 0}] 
 
+let init_state : state = {ship_list = init_ships; 
+                          current_grid = Battleship.init_grid Battleship.rows Battleship.columns []}
 
 let place (ship:ship) (coordOne:coordinate) (coordTwo:coordinate) (grid:grid) = 
   if not ((fst coordOne = fst coordTwo) || (snd coordOne = snd coordTwo)
