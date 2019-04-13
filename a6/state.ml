@@ -38,12 +38,13 @@ let rec update_grid coord currentGrid outlist =
   | ((r,c),s)::t  -> if (r,c) = coord then update_grid coord t (((r,c),Hit)::outlist)
     else update_grid coord t outlist
 
-
-let rec fire (coord: coordinate) (currentState: state) =
-  match currentState.current_grid with 
-  | [] -> currentState
-  | ((r,c),Occupied(s))::t when (r,c)=coord -> 
-    let update_ship_list = new_ship_list s currentState.ship_list [] in 
-    let update_grid = update_grid coord currentState.current_grid [] in 
-    {ship_list=update_ship_list; current_grid=update_grid}
-  | ((r,c),s)::t -> fire coord 
+let fire (coord: coordinate) (currentState: state) =
+  let rec fireHelper coord currGrid currShipList= 
+    match currGrid with 
+    | [] -> {ship_list = currShipList; current_grid = currGrid}
+    | ((r,c),Occupied(s))::t when (r,c)=coord -> 
+      let update_ship_list = new_ship_list s currShipList [] in 
+      let update_grid = update_grid coord currGrid [] in 
+      {ship_list=update_ship_list; current_grid=update_grid}
+    | ((_,_),_)::t -> fireHelper coord t currShipList
+  in fireHelper coord currentState.current_grid currentState.ship_list 
