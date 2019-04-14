@@ -35,11 +35,11 @@ let rec new_ship_list ship ship_list outlist : ship list=
                                                size=ship.size; hits=ship.hits+1}::outlist)
   | h::t -> new_ship_list ship t (h::outlist) 
 
-let rec update_grid coord currentGrid outlist = 
+let rec update_grid ship coord (currentGrid:Battleship.grid) outlist = 
   match currentGrid with 
   | [] -> outlist
-  | ((r,c),s)::t  -> if (r,c) = coord then update_grid coord t (((r,c),Hit)::outlist)
-    else update_grid coord t outlist
+  | ((r,c),s)::t  -> if (r,c) = coord then update_grid ship coord t (((r,c),Hit(ship))::outlist)
+    else update_grid ship coord t outlist
 
 let rec is_sunk ship : bool =
   if ship.hits=ship.size then true else is_sunk ship 
@@ -57,7 +57,7 @@ let fire (coord: coordinate) (currentState: state) =
              sunk_list = curr_sunk_list currShipList []}
     | ((r,c),Occupied(s))::t when (r,c)=coord -> 
       let update_ship_list = new_ship_list s currShipList [] in 
-      let update_grid = update_grid coord currGrid [] in 
+      let update_grid = update_grid s coord currGrid [] in 
       {ship_list=update_ship_list; current_grid=update_grid;
        sunk_list = curr_sunk_list update_ship_list []}
     | ((_,_),_)::t -> fireHelper coord t currShipList
