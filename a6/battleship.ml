@@ -39,7 +39,7 @@ let rec make_grid ship ship_coords grid (outlist: grid) : grid =
   | [] -> outlist
   | ((r,c),state)::t when state=Empty -> if (List.mem (r,c) ship_coords) 
     then make_grid ship ship_coords t (((r,c),Occupied(ship))::outlist)
-    else raise(Failure "This coordinate is not in the grid")
+    else make_grid ship ship_coords t (((r,c),Empty)::outlist)
   | _ -> raise(Failure "A ship is already placed here")
 
 

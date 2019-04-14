@@ -23,22 +23,25 @@ let init_state : state = {ship_list = init_ships;
                           sunk_list = [];
                           ships_on_grid = []}
 
+exception OutOfBounds 
+exception NotRight
+
 let place (ship:ship) (coordOne:coordinate) (coordTwo:coordinate) (state:state) = 
   if not ((fst coordOne = fst coordTwo) || (snd coordOne = snd coordTwo)
           || (fst coordOne = fst coordTwo && snd coordOne = snd coordTwo)) 
-  then raise (Failure "Invalid Coords")
+  then raise NotRight
   else if (snd coordOne = snd coordTwo && Pervasives.abs (Char.code (fst coordOne) 
-                                                          - Char.code(fst coordTwo)) = ship.size ) 
+                                                          - Char.code(fst coordTwo)) = ship.size - 1 ) 
   then 
     let coords = Battleship.make_new_char_list rows (snd coordOne) (fst coordOne) (fst coordTwo) [] in 
     {ship_list=init_ships; current_grid = Battleship.make_grid ship coords state.current_grid [];
      sunk_list=[]; ships_on_grid=ship::state.ships_on_grid}
-  else if (fst coordOne = fst coordTwo && Pervasives.abs (snd coordOne - snd coordTwo) = ship.size)
+  else if (fst coordOne = fst coordTwo && Pervasives.abs (snd coordOne - snd coordTwo) = ship.size - 1)
   then 
     let coords = Battleship.make_new_int_list (fst coordOne) columns (snd coordOne) (snd coordTwo) [] in 
     {ship_list=init_ships; current_grid = Battleship.make_grid ship coords state.current_grid [];
      sunk_list=[]; ships_on_grid=ship::state.ships_on_grid}
-  else raise (Failure "Invalid Coords")
+  else raise OutOfBounds
 
 let rec new_ship_list ship ship_list outlist : ship list= 
   match ship_list with 

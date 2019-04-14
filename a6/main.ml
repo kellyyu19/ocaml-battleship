@@ -48,43 +48,57 @@ let cmdToCoordTwo command =
 
 let rec play_game_helper state_p1 state_p2 turn =  
   if (placing state_p1) then 
-    ANSITerminal.print_string [ANSITerminal.Foreground Blue] 
-      "\n Player 1, please place your next ship. Ships remaining: " ^ queue state_p1;
-  let command = parse (read_line ()) in 
-  let ship = cmdToShip command in 
-  let coordOne = cmdToCoordOne command in 
-  let coordTwo = cmdToCoordTwo command in 
-  play_game_helper (place ship coordOne coordTwo state_p1) state_p2 turn
-else if (placing state_p2) then
-  ANSITerminal.print_string [ANSITerminal.Foreground Blue] 
-    "\n Player 2, please place your next ship. Ships remaining: " ^ queue state_p1;
-let command = parse (read_line ()) in 
-let ship = cmdToShip command in 
-let coordOne = cmdToCoordOne command in 
-let coordTwo = cmdToCoordTwo command in 
-play_game_helper state_p1 (place ship coordOne coordTwo state_p2) turn
-else 
-  try 
-    let userInput  = parse read_line () in
-    match userInput with 
-    | Fire coord -> fire cmdToTupleFire (if turn then state_p1 else state_p2)
-    | Status ->
-    | Quit -> 
-  with 
-  | Malformed -> print_endline "\n That was not a valid command.\n";
-    play_game_helper state_p1 state_p2 *) 
+    (ANSITerminal.(print_string [blue] 
+                     ("\n Player 1, please place your next ship. Ships remaining: " ^ queue state_p1 ^ "\n>"));
+     let command = parse (read_line ()) in 
+     let ship = cmdToShip command in 
+     let coordOne = cmdToCoordOne command in 
+     let coordTwo = cmdToCoordTwo command in 
+     play_game_helper (place ship coordOne coordTwo state_p1) state_p2 turn)
+  else if (placing state_p2) then
+    (ANSITerminal.(print_string [blue] 
+                     ("\n Player 2, please place your next ship. Ships remaining: " ^ queue state_p1 ^ "\n>"));
+     let command = parse (read_line ()) in 
+     let ship = cmdToShip command in 
+     let coordOne = cmdToCoordOne command in 
+     let coordTwo = cmdToCoordTwo command in 
+     play_game_helper state_p1 (place ship coordOne coordTwo state_p2) turn)
+  else 
+    try 
+      let userInput  = parse (read_line ()) in
+      match userInput with 
+      | Fire coord -> 
+        let new_state = fire (cmdToTupleFire userInput) (if turn then state_p1 else state_p2) in 
+        (if turn && new_state = state_p2 then (print_endline "\n You have already fired here.";
+                                               play_game_helper state_p1 state_p2 turn)
+         else if turn then (play_game_helper state_p1 new_state (not turn))
+         else if new_state = state_p1 then (print_endline "\n You have already fired here.";
+                                            play_game_helper state_p1 state_p2 (not turn))
+         else play_game_helper new_state state_p2 turn)
+      | Status -> play_game_helper state_p1 state_p2 turn
+      | Quit -> play_game_helper state_p1 state_p2 turn
+      | Place ship-> print_endline "\n All ships have already been placed";
+        play_game_helper state_p1 state_p2 turn  
+
+    with 
+    | Malformed -> print_endline "\n That was not a valid command.\n";
+      play_game_helper state_p1 state_p2 turn
+    | OutOfBounds -> print_endline "\n That was not a valid command.\n";
+      play_game_helper state_p1 state_p2 turn
+    | NotRight -> print_endline "\n That was not a valid command.\n";
+      play_game_helper state_p1 state_p2 turn
 
 
 
-(* let play_game start = 
-   play_game_helper init_state init_state *)
+let play_game start = 
+  play_game_helper init_state init_state true
 
 
-(* let main () = 
-   ANSITerminal.print_string [ANSITerminal.Foreground Blue] "\n Battleship\n";
-   print_endline "\n Please type start to play a new game.\n ";
-   print_string ">>>";
-   let start = read_line () in play_game start *)
+let main () = 
+  ANSITerminal.print_string [ANSITerminal.Foreground Blue] "\n Battleship\n";
+  print_endline "\n Please type start to play a new game.\n ";
+  print_string ">>>";
+  let start = read_line () in play_game start 
 
 
-(* let () = main ()
+let () = main ()
