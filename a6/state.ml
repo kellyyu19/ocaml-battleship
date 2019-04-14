@@ -1,6 +1,7 @@
 open Battleship
 
-type state = {ship_list: ship list; current_grid: grid; sunk_list: ship list}
+type state = {ship_list: ship list; current_grid: grid; sunk_list: ship list; 
+              ships_on_grid: ship list}
 
 let init_ships = 
   [{name = Battleship; size = 4; hits = 0}; {name = Cruiser; size = 3; hits = 0}; 
@@ -9,7 +10,8 @@ let init_ships =
 
 let init_state : state = {ship_list = init_ships; 
                           current_grid = Battleship.init_grid Battleship.rows Battleship.columns [];
-                          sunk_list = []}
+                          sunk_list = [];
+                          ships_on_grid = []}
 
 let place (ship:ship) (coordOne:coordinate) (coordTwo:coordinate) (state:state) = 
   if not ((fst coordOne = fst coordTwo) || (snd coordOne = snd coordTwo)
@@ -20,12 +22,12 @@ let place (ship:ship) (coordOne:coordinate) (coordTwo:coordinate) (state:state) 
   then 
     let coords = Battleship.make_new_char_list rows (snd coordOne) (fst coordOne) (fst coordTwo) [] in 
     {ship_list=init_ships; current_grid = Battleship.make_grid ship coords state.current_grid [];
-     sunk_list=[]}
+     sunk_list=[]; ships_on_grid=ship::state.ships_on_grid}
   else if (fst coordOne = fst coordTwo && Pervasives.abs (snd coordOne - snd coordTwo) = ship.size)
   then 
     let coords = Battleship.make_new_int_list (fst coordOne) columns (snd coordOne) (snd coordTwo) [] in 
     {ship_list=init_ships; current_grid = Battleship.make_grid ship coords state.current_grid [];
-     sunk_list=[]}
+     sunk_list=[]; ships_on_grid=ship::state.ships_on_grid}
   else raise (Failure "Invalid Coords")
 
 let rec new_ship_list ship ship_list outlist : ship list= 
@@ -54,11 +56,39 @@ let fire (coord: coordinate) (currentState: state) =
   let rec fireHelper coord currGrid currShipList= 
     match currGrid with 
     | [] -> {ship_list = currShipList; current_grid = currGrid; 
-             sunk_list = curr_sunk_list currShipList []}
+             sunk_list = curr_sunk_list currShipList [];
+             ships_on_grid = currentState.ships_on_grid}
     | ((r,c),Occupied(s))::t when (r,c)=coord -> 
       let update_ship_list = new_ship_list s currShipList [] in 
       let update_grid = update_grid s coord currGrid [] in 
       {ship_list=update_ship_list; current_grid=update_grid;
-       sunk_list = curr_sunk_list update_ship_list []}
+       sunk_list = curr_sunk_list update_ship_list [];
+       ships_on_grid = currentState.ships_on_grid}
     | ((_,_),_)::t -> fireHelper coord t currShipList
   in fireHelper coord currentState.current_grid currentState.ship_list 
+
+let placing currentState : bool = 
+  if List.length currentState.ships_on_grid <> 5 then true else false
+
+let string_of_ships ship = 
+  match ship.name with 
+  | Carrier -> "Carrier"
+  | Battleship -> "Battleship"
+  | Cruiser -> "Cruiser"
+  | Submarine -> "Submarine"
+  | Destroyer -> "Destroyer"
+
+let rec queue_helper currentState initships outlist : ship list = 
+  let curr_ships_on_grid = currentState.ships_on_grid in 
+  match initships with 
+  | [] -> outlist 
+  | h::t -> if List.mem h curr_ships_on_grid then queue_helper currentState t outlist 
+    else queue_helper currentState t (h::outlist)
+
+let queue currentState = 
+  let ships_left = queue_helper currentState init_ships [] in 
+  let ship_name ship = string_of_ships ship in 
+  let concat a b = 
+    if a="" then b else (a ^ ", " ^ b) in
+  let ships_left_names = List.map ship_name ships_left in
+  List.fold_left concat "" ships_left_names
