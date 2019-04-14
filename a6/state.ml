@@ -3,10 +3,20 @@ open Battleship
 type state = {ship_list: ship list; current_grid: grid; sunk_list: ship list; 
               ships_on_grid: ship list}
 
+let init_battleship = {name = Battleship; size = 4; hits = 0}
+
+let init_cruiser = {name = Cruiser; size = 3; hits = 0}
+
+let init_submarine = {name = Submarine; size = 3; hits = 0}
+
+let init_destroyer = {name = Destroyer; size = 2; hits = 0}
+
+let init_carrier = {name = Carrier; size = 2; hits = 0}
+
 let init_ships = 
   [{name = Battleship; size = 4; hits = 0}; {name = Cruiser; size = 3; hits = 0}; 
    {name = Submarine; size = 3; hits = 0}; {name = Destroyer; size = 2; hits = 0};
-   {name = Destroyer; size = 2; hits = 0}] 
+   {name = Carrier; size = 2; hits = 0}] 
 
 let init_state : state = {ship_list = init_ships; 
                           current_grid = Battleship.init_grid Battleship.rows Battleship.columns [];

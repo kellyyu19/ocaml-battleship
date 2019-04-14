@@ -11,15 +11,24 @@ let cmdToTupleFire command =
     (String.get coord 0,int_of_char (String.get coord 1))
   | _ -> raise Malformed
 
+let string_to_ship str = 
+  match str with 
+  | "battleship" -> init_battleship
+  | "cruiser" -> init_cruiser
+  | "carrier" -> init_carrier
+  | "submarine" -> init_submarine
+  | "destroyer" -> init_destroyer
+  | _ -> raise Malformed
+
 let cmdToShip command = 
   match command with 
   | Place list when (List.length list = 3) -> 
     (match List.nth list 0 with 
-     | "carrier" -> Carrier
-     | "battleship" -> Battleship
-     | "cruiser" -> Cruiser
-     | "submarine" -> Submarine
-     | "destroyer" -> Destroyer
+     | "carrier" -> string_to_ship "carrier"
+     | "battleship" -> string_to_ship "battleship"
+     | "cruiser" -> string_to_ship "cruiser"
+     | "submarine" -> string_to_ship "submarine"
+     | "destroyer" -> string_to_ship "destroyer"
      | _ -> raise Malformed)
   | _ -> raise Malformed
 
@@ -35,29 +44,35 @@ let cmdToCoordTwo command =
     (String.get coord 0,int_of_char (String.get coord 1))
   | _ -> raise Malformed
 
+
+
 let rec play_game_helper state_p1 state_p2 turn =  
   if (placing state_p1) then 
     ANSITerminal.print_string [ANSITerminal.Foreground Blue] 
       "\n Player 1, please place your next ship. Ships remaining: " ^ queue state_p1;
-  let command = shave read_line () in 
+  let command = parse (read_line ()) in 
   let ship = cmdToShip command in 
   let coordOne = cmdToCoordOne command in 
   let coordTwo = cmdToCoordTwo command in 
-  play_game_helper (place ship coordOne coordTwo state_p1) state_p2
+  play_game_helper (place ship coordOne coordTwo state_p1) state_p2 turn
 else if (placing state_p2) then
   ANSITerminal.print_string [ANSITerminal.Foreground Blue] 
     "\n Player 2, please place your next ship. Ships remaining: " ^ queue state_p1;
-play_game_helper (place state_p1) state_p2
+let command = parse (read_line ()) in 
+let ship = cmdToShip command in 
+let coordOne = cmdToCoordOne command in 
+let coordTwo = cmdToCoordTwo command in 
+play_game_helper state_p1 (place ship coordOne coordTwo state_p2) turn
 else 
   try 
-    let userInput  = shave read_line () in
+    let userInput  = parse read_line () in
     match userInput with 
     | Fire coord -> fire cmdToTupleFire (if turn then state_p1 else state_p2)
     | Status ->
     | Quit -> 
   with 
   | Malformed -> print_endline "\n That was not a valid command.\n";
-    play_game_helper state_p1 state_p2 *)
+    play_game_helper state_p1 state_p2 *) 
 
 
 
