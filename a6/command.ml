@@ -1,5 +1,5 @@
 type entry_phrase = string list
-type command = Start | Fire of entry_phrase | Quit | Status
+type command = Fire of entry_phrase | Quit | Status
 exception Empty 
 exception Malformed 
 
@@ -14,8 +14,7 @@ let rec shave (entry:entry_phrase) (acc:entry_phrase) : entry_phrase =
 let parseHelper (entry:entry_phrase) : command = 
   match entry with 
   | [] -> raise Empty
-  | h::t -> match h with 
-    | "start" -> if t=[] then Start else raise Malformed
+  | h::t -> match h with
     | "fire"  -> if t=[] then raise Malformed else Fire t
     | "quit"  -> if t=[] then Quit else raise Malformed 
     | "status" -> if t=[] then Status else raise Malformed

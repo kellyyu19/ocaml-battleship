@@ -5,11 +5,15 @@ open Command
 
 
 
+let cmdToTupleFire command =
+  match command with
+  | Fire list when (List.length list = 1) -> let coord = List.nth list 0 in 
+    (String.get coord 0,int_of_char (String.get coord 1))
+  | _ -> raise Malformed
 
 
 
-
-let rec play_game_helper state_p1 state_p2 =  
+let rec play_game_helper state_p1 state_p2 turn =  
   if (placing state_p1) then 
     ANSITerminal.print_string [ANSITerminal.Foreground Blue] 
       "\n Player 1, please place your next ship. Ships remaining: " ^ queue state_p1;
@@ -20,6 +24,11 @@ else if (placing state_p2) then
 play_game_helper (place state_p1) state_p2
 else 
   try 
+    let userInput  = shave read_line () in
+    match userInput with 
+    | Fire coord -> fire cmdToTupleFire (if turn then state_p1 else state_p2)
+    | Status ->
+    | Quit -> 
   with 
   | Malformed -> print_endline "\n That was not a valid command.\n";
     play_game_helper state_p1 state_p2
