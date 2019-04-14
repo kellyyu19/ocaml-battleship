@@ -11,13 +11,39 @@ let cmdToTupleFire command =
     (String.get coord 0,int_of_char (String.get coord 1))
   | _ -> raise Malformed
 
+let cmdToShip command = 
+  match command with 
+  | Place list when (List.length list = 3) -> 
+    (match List.nth list 0 with 
+     | "carrier" -> Carrier
+     | "battleship" -> Battleship
+     | "cruiser" -> Cruiser
+     | "submarine" -> Submarine
+     | "destroyer" -> Destroyer
+     | _ -> raise Malformed)
+  | _ -> raise Malformed
 
+let cmdToCoordOne command = 
+  match command with 
+  | Place list when (List.length list = 3) -> let coord = List.nth list 1 in 
+    (String.get coord 0,int_of_char (String.get coord 1))
+  | _ -> raise Malformed
+
+let cmdToCoordTwo command = 
+  match command with 
+  | Place list when (List.length list = 3) -> let coord = List.nth list 2 in 
+    (String.get coord 0,int_of_char (String.get coord 1))
+  | _ -> raise Malformed
 
 let rec play_game_helper state_p1 state_p2 turn =  
   if (placing state_p1) then 
     ANSITerminal.print_string [ANSITerminal.Foreground Blue] 
       "\n Player 1, please place your next ship. Ships remaining: " ^ queue state_p1;
-  play_game_helper (place state_p1) state_p2
+  let command = shave read_line () in 
+  let ship = cmdToShip command in 
+  let coordOne = cmdToCoordOne command in 
+  let coordTwo = cmdToCoordTwo command in 
+  play_game_helper (place ship coordOne coordTwo state_p1) state_p2
 else if (placing state_p2) then
   ANSITerminal.print_string [ANSITerminal.Foreground Blue] 
     "\n Player 2, please place your next ship. Ships remaining: " ^ queue state_p1;
@@ -31,19 +57,19 @@ else
     | Quit -> 
   with 
   | Malformed -> print_endline "\n That was not a valid command.\n";
-    play_game_helper state_p1 state_p2
+    play_game_helper state_p1 state_p2 *)
 
 
 
-let play_game start = 
-  play_game_helper init_state init_state
+(* let play_game start = 
+   play_game_helper init_state init_state *)
 
 
-let main () = 
-  ANSITerminal.print_string [ANSITerminal.Foreground Blue] "\n Battleship\n";
-  print_endline "\n Please type start to play a new game.\n ";
-  print_string ">>>";
-  let start = read_line () in play_game start
+(* let main () = 
+   ANSITerminal.print_string [ANSITerminal.Foreground Blue] "\n Battleship\n";
+   print_endline "\n Please type start to play a new game.\n ";
+   print_string ">>>";
+   let start = read_line () in play_game start *)
 
 
-let () = main ()
+(* let () = main ()
