@@ -7,6 +7,7 @@ type point = coordinate * status
 type grid = point list
 
 exception ShipHere
+exception Malformed 
 
 
 let rows = ['a';'b';'c';'d';'e';'f';'g';'h';'i';'j']
@@ -41,7 +42,10 @@ let rec make_grid ship ship_coords grid (outlist: grid) : grid =
   | ((r,c),state)::t when state=Empty -> if (List.mem (r,c) ship_coords) 
     then make_grid ship ship_coords t (((r,c),Occupied(ship))::outlist)
     else make_grid ship ship_coords t (((r,c),Empty)::outlist)
-  | _ -> raise ShipHere
+  | ((r,c),Occupied(s))::t -> if (List.mem (r,c) ship_coords)
+    then raise ShipHere else make_grid ship ship_coords t (((r,c),Occupied(s))::outlist)
+  | _ -> raise Malformed
+
 
 
 
