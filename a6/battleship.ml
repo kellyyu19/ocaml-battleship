@@ -6,6 +6,7 @@ type status = Occupied of ship | Hit of ship | Sunk of ship | Empty
 type point = coordinate * status
 type grid = point list
 
+exception ShipHere
 
 
 let rows = ['a';'b';'c';'d';'e';'f';'g';'h';'i';'j']
@@ -26,13 +27,13 @@ let rec make_new_int_list (r:char) (c:int list) (c1:int) (c2:int) outlist =
   match c with 
   |[] -> outlist
   |h::t when h>=c1 && h<=c2 -> make_new_int_list r t c1 c2 ((r,h)::outlist)
-  |h::t -> outlist
+  |h::t -> make_new_int_list r t c1 c2 outlist
 
 let rec make_new_char_list (r:char list) (c:int) (r1:char) (r2:char) outlist = 
   match r with 
   |[] -> outlist
   |h::t when h>=r1 && h<=r2 -> make_new_char_list t c r1 r2 ((h,c)::outlist)
-  |h::t -> outlist
+  |h::t -> make_new_char_list t c r1 r2 outlist
 
 let rec make_grid ship ship_coords grid (outlist: grid) : grid = 
   match grid with 
@@ -40,7 +41,7 @@ let rec make_grid ship ship_coords grid (outlist: grid) : grid =
   | ((r,c),state)::t when state=Empty -> if (List.mem (r,c) ship_coords) 
     then make_grid ship ship_coords t (((r,c),Occupied(ship))::outlist)
     else make_grid ship ship_coords t (((r,c),Empty)::outlist)
-  | _ -> raise(Failure "A ship is already placed here")
+  | _ -> raise ShipHere
 
 
 
