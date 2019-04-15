@@ -24,10 +24,10 @@ let rec sort_and_group_rows rows (grid:Battleship.grid) outlist =
 let rec print_row sortedrow outstring = 
   match sortedrow with 
   |[]-> outstring
-  |((r,c),Hit(s))::t -> print_row t (outstring ^ "*") 
-  |((r,c),Sunk(s))::t -> print_row t (outstring ^ "/") 
-  |((r,c),Empty)::t -> print_row t (outstring ^ "-") 
-  |((r,c),Occupied(s))::t -> print_row t (outstring ^ "-") 
+  |((r,c),Hit(s))::t -> print_row t (outstring ^ "*     ") 
+  |((r,c),Sunk(s))::t -> print_row t (outstring ^ "/     ") 
+  |((r,c),Empty)::t -> print_row t (outstring ^ "-     ") 
+  |((r,c),Occupied(s))::t -> print_row t (outstring ^ "-     ") 
 
 let labeled_row sortedrow = 
   match sortedrow with 
@@ -37,8 +37,9 @@ let labeled_row sortedrow =
 
 let rec text_grid (rowlist:Battleship.point list list) outstring = 
   match rowlist with
-  |[]-> print_string ("	1   2   3   4   5   6   7   8   9   10   11   12   13" 
-                      ^"\n"^ outstring)
-  |h::t -> text_grid t (outstring ^"\n"^ labeled_row h)
+  |[]-> print_string (
+      "        1     2     3     4     5     6     7     8     9     10" 
+      ^"\n"^ outstring)
+  |h::t -> text_grid t (outstring ^"\n"^"\n"^ labeled_row h)
 
 
