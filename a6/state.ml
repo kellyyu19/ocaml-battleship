@@ -82,6 +82,12 @@ let fire (coord: coordinate) (currentState: state) =
       {ship_list=currShipList; current_grid=update_grid_var;
        sunk_list = currentState.sunk_list;
        ships_on_grid = currentState.ships_on_grid}
+    | ((r,c),Hit(s))::t when (r,c)=coord -> {ship_list = currShipList; current_grid = currGrid; 
+                                             sunk_list = curr_sunk_list currShipList [];
+                                             ships_on_grid = currentState.ships_on_grid}
+    | ((r,c),Miss)::t when (r,c)=coord -> {ship_list = currShipList; current_grid = currGrid; 
+                                           sunk_list = curr_sunk_list currShipList [];
+                                           ships_on_grid = currentState.ships_on_grid}
     | ((r,c),Occupied(s))::t when (r,c)=coord -> 
       let update_ship_list = new_ship_list s currShipList [] in 
       let update_grid_var = update_grid_occupied s coord currGrid [] in 
