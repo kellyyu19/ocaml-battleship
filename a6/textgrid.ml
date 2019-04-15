@@ -27,7 +27,9 @@ let rec print_row sortedrow outstring =
   |((r,c),Hit(s))::t -> print_row t (outstring ^ "*     ") 
   |((r,c),Sunk(s))::t -> print_row t (outstring ^ "/     ") 
   |((r,c),Empty)::t -> print_row t (outstring ^ "-     ") 
-  |((r,c),Occupied(s))::t -> print_row t (outstring ^ "-     ") 
+  |((r,c),Occupied(s))::t -> print_row t (outstring ^ "-     ")
+  |((r,c),Miss)::t -> print_row t (outstring ^ "x     ")
+
 
 let labeled_row sortedrow = 
   match sortedrow with 
