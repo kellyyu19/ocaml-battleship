@@ -82,26 +82,26 @@ let rec play_game_helper state_p1 state_p2 turn =
          play_game_helper state_p1 (place ship coordOne coordTwo state_p2) turn)
     else 
       (ANSITerminal.(print_string [blue] 
-                       ("\n The game has now started."));
-       (if turn then (ANSITerminal.(print_string [blue] ("\n Player 1, make a move.\n >"));
-        else (ANSITerminal.(print_string [blue] ("\n Player 2, make a move.\n >")););;
-        let userInput  = parse (read_line ()) in
-        match userInput with 
-        | Fire coord -> 
-          let new_state = fire (cmdToTupleFire userInput) (if turn then state_p1 else state_p2) in 
-          (if turn && new_state = state_p2 then (print_endline "\n You have already fired here.";
-                                                 play_game_helper state_p1 state_p2 turn)
-           else if turn then (play_game_helper state_p1 new_state (not turn))
-           else if new_state = state_p1 then (print_endline "\n You have already fired here.";
-                                              play_game_helper state_p1 state_p2 (not turn))
-           else play_game_helper new_state state_p2 turn)
-        | Status -> print_endline ("You have sunk: " ^ 
-                                   (string_of_int (if turn then getAmountSunk state_p1.sunk_list 0 
-                                                   else getAmountSunk state_p2.sunk_list 0)));
-          play_game_helper state_p1 state_p2 turn
-        | Quit -> print_endline "Goodbye!"; exit 0
-        | Place ship-> print_endline "\n All ships have already been placed";
-          play_game_helper state_p1 state_p2 turn  
+                       ("\n The game has now started." ^ if turn then "\n Player 1, make a move.\n >"
+                        else "\n Player 2, make a move.\n >"))); 
+
+    let userInput  = parse (read_line ()) in
+    match userInput with 
+    | Fire coord -> 
+      let new_state = fire (cmdToTupleFire userInput) (if turn then state_p1 else state_p2) in 
+      (if turn && new_state = state_p2 then (print_endline "\n You have already fired here.";
+                                             play_game_helper state_p1 state_p2 turn)
+       else if turn then (play_game_helper state_p1 new_state (not turn))
+       else if new_state = state_p1 then (print_endline "\n You have already fired here.";
+                                          play_game_helper state_p1 state_p2 (not turn))
+       else play_game_helper new_state state_p2 turn)
+    | Status -> print_endline ("You have sunk: " ^ 
+                               (string_of_int (if turn then getAmountSunk state_p1.sunk_list 0 
+                                               else getAmountSunk state_p2.sunk_list 0)));
+      play_game_helper state_p1 state_p2 turn
+    | Quit -> print_endline "Goodbye!"; exit 0
+    | Place ship-> print_endline "\n All ships have already been placed";
+      play_game_helper state_p1 state_p2 turn  
 
   with 
   | Malformed -> print_endline "\n That was not a valid command.\n";
