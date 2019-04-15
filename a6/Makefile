@@ -1,4 +1,4 @@
-MODULES=battleship command state main
+MODULES=battleship command state main textgrid
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MAIN=main.byte
