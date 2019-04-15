@@ -88,13 +88,13 @@ let rec play_game_helper state_p1 state_p2 turn =
     let userInput  = parse (read_line ()) in
     match userInput with 
     | Fire coord -> 
-      let new_state = fire (cmdToTupleFire userInput) (if turn then state_p1 else state_p2) in 
+      let new_state = fire (cmdToTupleFire userInput) (if turn then state_p1 else state_p2) in print_endline "line 91 main new_state";
       (if turn && new_state = state_p2 then (print_endline "\n You have already fired here.";
                                              play_game_helper state_p1 state_p2 turn)
-       else if turn then (play_game_helper state_p1 new_state (not turn))
+       else if turn then (print_endline "successful fire"; play_game_helper state_p1 new_state (not turn))
        else if new_state = state_p1 then (print_endline "\n You have already fired here.";
                                           play_game_helper state_p1 state_p2 (not turn))
-       else play_game_helper new_state state_p2 turn)
+       else print_endline "line 97"; play_game_helper new_state state_p2 turn)
     | Status -> print_endline ("You have sunk: " ^ 
                                (string_of_int (if turn then getAmountSunk state_p1.sunk_list 0 
                                                else getAmountSunk state_p2.sunk_list 0)));
