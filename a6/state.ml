@@ -50,14 +50,20 @@ let rec new_ship_list ship ship_list outlist : ship list= print_endline "line 46
                                                size=ship.size; hits=ship.hits+1}::outlist)
   | h::t -> new_ship_list ship t (h::outlist) 
 
-let rec update_grid ship coord (currentGrid:Battleship.grid) outlist = print_endline "line 53";
+let rec update_grid_occupied ship coord (currentGrid:Battleship.grid) outlist = 
   match currentGrid with 
   | [] -> outlist
   | ((r,c),s)::t  -> if (r,c) = coord then (((r,c),Hit(ship))::outlist) @ t 
-    else update_grid ship coord t outlist
+    else update_grid_occupied ship coord t (((r,c),s)::outlist)
 
-let rec is_sunk ship : bool =
-  if ship.hits=ship.size then true else is_sunk ship 
+let rec update_grid_empty coord (currentGrid:Battleship.grid) outlist =
+  match currentGrid with
+  | [] -> outlist
+  | ((r,c),s)::t  -> if (r,c) = coord && s=Empty then (((r,c),Miss)::outlist) @ t 
+    else update_grid_empty coord t (((r,c),Empty)::outlist)
+
+let is_sunk ship : bool =
+  if ship.hits=ship.size then true else false
 
 let rec curr_sunk_list currShipList outlist = 
   match currShipList with 
@@ -66,22 +72,23 @@ let rec curr_sunk_list currShipList outlist =
     else curr_sunk_list t outlist
 
 let fire (coord: coordinate) (currentState: state) =
-  print_endline "in fire outside helper";
   let rec fireHelper coord currGrid currShipList= 
-    print_endline "in helper";
     match currGrid with 
     | [] -> {ship_list = currShipList; current_grid = currGrid; 
              sunk_list = curr_sunk_list currShipList [];
              ships_on_grid = currentState.ships_on_grid}
+    | ((r,c),Empty)::t when (r,c) = coord -> 
+      let update_grid_var = update_grid_empty coord currGrid [] in 
+      {ship_list=currShipList; current_grid=update_grid_var;
+       sunk_list = currentState.sunk_list;
+       ships_on_grid = currentState.ships_on_grid}
     | ((r,c),Occupied(s))::t when (r,c)=coord -> 
-      print_endline "line 77";
       let update_ship_list = new_ship_list s currShipList [] in 
-      print_endline "line 79";
-      let update_grid_var = update_grid s coord currGrid [] in print_endline "line 80";
+      let update_grid_var = update_grid_occupied s coord currGrid [] in 
       {ship_list=update_ship_list; current_grid=update_grid_var;
        sunk_list = curr_sunk_list update_ship_list [];
        ships_on_grid = currentState.ships_on_grid}
-    | ((_,_),_)::t -> print_endline "line 84"; fireHelper coord t currShipList
+    | ((_,_),_)::t -> fireHelper coord t currShipList
   in fireHelper coord currentState.current_grid currentState.ship_list 
 
 let placing currentState : bool = 

@@ -2,7 +2,7 @@
 type name = Carrier | Battleship | Cruiser | Submarine | Destroyer 
 type ship = {name: name; size: int; hits: int}
 type coordinate = char * int 
-type status = Occupied of ship | Hit of ship | Sunk of ship | Empty  
+type status = Occupied of ship | Hit of ship | Sunk of ship | Empty | Miss
 type point = coordinate * status
 type grid = point list
 
