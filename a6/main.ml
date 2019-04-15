@@ -1,7 +1,7 @@
 open Battleship
 open State
 open Command
-
+open Textgrid
 
 
 
@@ -47,6 +47,11 @@ let cmdToCoordTwo command =
 
 
 let rec play_game_helper state_p1 state_p2 turn =  
+  print_endline ("Player 1's Targets':" ^"\n"^
+                 (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p1.current_grid) []) ""));
+
+  print_endline ("Player 2's Targets':" ^"\n"^
+                 (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p2.current_grid) []) ""));
   try 
     if (placing state_p1) then 
       (ANSITerminal.(print_string [blue] 

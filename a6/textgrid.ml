@@ -37,7 +37,7 @@ let labeled_row sortedrow =
 
 let rec text_grid (rowlist:Battleship.point list list) outstring = 
   match rowlist with
-  |[]-> print_string (
+  |[]->  (
       "        1     2     3     4     5     6     7     8     9     10" 
       ^"\n"^ outstring)
   |h::t -> text_grid t (outstring ^"\n"^"\n"^ labeled_row h)
