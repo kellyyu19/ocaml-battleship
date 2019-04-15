@@ -90,7 +90,10 @@ let rec play_game_helper state_p1 state_p2 turn =
          else if new_state = state_p1 then (print_endline "\n You have already fired here.";
                                             play_game_helper state_p1 state_p2 (not turn))
          else play_game_helper new_state state_p2 turn)
-      | Status -> play_game_helper state_p1 state_p2 turn
+      | Status -> print_endline ("You have sunk: " ^ 
+                                 (string_of_int (if turn then getAmountSunk state_p1.sunk_list 0 
+                                                 else getAmountSunk state_p2.sunk_list 0)));
+        play_game_helper state_p1 state_p2 turn
       | Quit -> print_endline "Goodbye!"; exit 0
       | Place ship-> print_endline "\n All ships have already been placed";
         play_game_helper state_p1 state_p2 turn  

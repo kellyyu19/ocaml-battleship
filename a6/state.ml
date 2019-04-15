@@ -105,3 +105,8 @@ let queue currentState =
     if a="" then b else (a ^ ", " ^ b) in
   let ships_left_names = List.map ship_name ships_left in
   List.fold_left concat "" ships_left_names
+
+let rec getAmountSunk lst accum = 
+  match lst with
+  | [] -> accum
+  | h::t -> getAmountSunk t (accum + 1)

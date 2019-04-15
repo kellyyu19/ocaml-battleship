@@ -4,3 +4,4 @@
 #load "battleship.cmo";;
 #load "command.cmo";;
 #load "state.cmo";;
+#load "textgrid.cmo";;
