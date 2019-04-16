@@ -59,8 +59,8 @@ let rec update_grid_occupied ship coord (currentGrid:Battleship.grid) outlist =
 let rec update_grid_empty coord (currentGrid:Battleship.grid) outlist =
   match currentGrid with
   | [] -> outlist
-  | ((r,c),s)::t  -> if (r,c) = coord && s=Empty then update_grid_empty coord t (((r,c),Miss)::outlist)
-    else update_grid_empty coord t (((r,c),Empty)::outlist)
+  | ((r,c),s)::t  -> if (r,c) = coord then (((r,c),Miss)::outlist) @ t
+    else update_grid_empty coord t (((r,c),s)::outlist)
 
 let is_sunk ship : bool =
   if ship.hits=ship.size then true else false
