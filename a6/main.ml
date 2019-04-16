@@ -55,9 +55,9 @@ let cmdToCoordTwo command =
   | _ -> raise Malformed
 
 let print_text_grid state_p1 state_p2 = 
-  print_endline ("Player 1's Targets':" ^"\n"^
+  print_endline ("Player 1's Ships':" ^"\n"^
                  (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p1.current_grid) []) "")); 
-  print_endline ("Player 2's Targets':" ^"\n"^
+  print_endline ("Player 2's Ships':" ^"\n"^
                  (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p2.current_grid) []) "")); ()
 
 let rec play_game_helper state_p1 state_p2 turn =  
@@ -101,13 +101,22 @@ let rec play_game_helper state_p1 state_p2 turn =
       let new_state = fire (cmdToTupleFire userInput) (if turn then state_p2 else state_p1) in 
       (if turn && new_state = state_p2 then (print_text_grid state_p1 state_p2; print_endline "\n Nothing has happened. ";
                                              play_game_helper state_p1 state_p2 (not turn))
-       else if turn then (print_text_grid state_p1 new_state; print_endline "successful fire"; play_game_helper state_p1 new_state (not turn))
+       else if turn 
+       then (print_text_grid state_p1 new_state; 
+             print_endline "successful fire"; 
+             if winOrNot new_state.sunk_list then (print_endline "Player 1 has won."; exit 0)
+             else 
+               play_game_helper state_p1 new_state (not turn))
        else if new_state = state_p1 then (print_text_grid state_p1 state_p2; print_endline "\n Nothing has happened.";
                                           play_game_helper state_p1 state_p2 (not turn))
-       else print_text_grid new_state state_p2; print_endline "successful fire"; play_game_helper new_state state_p2 (not turn))
+       else print_text_grid new_state state_p2; 
+       print_endline "successful fire";
+       if winOrNot new_state.sunk_list then (print_endline "Player 2 has won."; exit 0)
+       else  
+         play_game_helper new_state state_p2 (not turn))
     | Status -> print_endline ("You have sunk: " ^ 
-                               (string_of_int (if turn then getAmountSunk state_p1.sunk_list 0 
-                                               else getAmountSunk state_p2.sunk_list 0)));
+                               (string_of_int (if turn then getAmountSunk state_p2.sunk_list 0 
+                                               else getAmountSunk state_p1.sunk_list 0)));
       play_game_helper state_p1 state_p2 turn
     | Quit -> print_endline "Goodbye!"; exit 0
     | Place ship-> print_endline "\n All ships have already been placed";

@@ -58,15 +58,15 @@ let rec sink_ship ship (currentGrid:Battleship.grid) outlist =
   |((r,c),s)::t -> sink_ship ship t (((r,c),s)::outlist)
 
 
-let rec update_grid_occupied ship coord (currentGrid:Battleship.grid) outlist = 
+let rec update_grid_occupied ship coord state (currentGrid:Battleship.grid) outlist = 
   match currentGrid with 
   | [] -> outlist
   | ((r,c),s)::t  -> if (r,c) = coord 
     then 
       let new_ship = {ship with hits = ship.hits+1} in
-      if new_ship.hits = new_ship.size then sink_ship ship currentGrid []
+      if new_ship.hits = new_ship.size then sink_ship ship state.current_grid []
       else (((r,c),Hit(new_ship))::outlist) @ t 
-    else update_grid_occupied ship coord t (((r,c),s)::outlist)
+    else update_grid_occupied ship coord state t (((r,c),s)::outlist)
 
 let rec update_grid_empty coord (currentGrid:Battleship.grid) outlist =
   match currentGrid with
@@ -102,7 +102,7 @@ let fire (coord: coordinate) (currentState: state) =
                                            ships_on_grid = currentState.ships_on_grid}
     | ((r,c),Occupied(s))::t when (r,c)=coord -> 
       let update_ship_list = new_ship_list s currShipList [] in 
-      let update_grid_var = update_grid_occupied s coord currGrid [] in 
+      let update_grid_var = update_grid_occupied s coord currentState currGrid [] in 
       {ship_list=update_ship_list; current_grid=update_grid_var;
        sunk_list = curr_sunk_list update_ship_list [];
        ships_on_grid = currentState.ships_on_grid}
