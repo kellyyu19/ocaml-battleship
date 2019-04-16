@@ -8,7 +8,10 @@ open Textgrid
 let cmdToTupleFire command =
   match command with
   | Fire list when (List.length list = 1) -> let coord = List.nth list 0 in 
-    (String.get coord 0, int_of_char (String.get coord 1) - 48)
+    if String.length coord = 2 then 
+      (String.get coord 0, int_of_char (String.get coord 1) - 48)
+    else 
+      (String.get coord 0, 10)
   | _ -> raise Malformed
 
 let string_to_ship str = 
@@ -35,13 +38,19 @@ let cmdToShip command =
 let cmdToCoordOne command = 
   match command with 
   | Place list when (List.length list = 3) -> let coord = List.nth list 1 in 
-    (String.get coord 0, int_of_char (String.get coord 1) - 48)
+    if String.length coord = 2 then 
+      (String.get coord 0, int_of_char (String.get coord 1) - 48)
+    else 
+      (String.get coord 0, 10)
   | _ -> raise Malformed
 
 let cmdToCoordTwo command = 
   match command with 
   | Place list when (List.length list = 3) -> let coord = List.nth list 2 in 
-    (String.get coord 0, int_of_char (String.get coord 1) - 48)
+    if String.length coord = 2 then 
+      (String.get coord 0, int_of_char (String.get coord 1) - 48)
+    else 
+      (String.get coord 0, 10)
   | _ -> raise Malformed
 
 let print_text_grid state_p1 state_p2 = 
