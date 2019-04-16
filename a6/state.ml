@@ -134,3 +134,6 @@ let rec getAmountSunk lst accum =
   match lst with
   | [] -> accum
   | h::t -> getAmountSunk t (accum + 1) 
+
+let winOrNot lst : bool = 
+  if List.length lst = 5 then true else false
