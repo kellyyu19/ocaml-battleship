@@ -100,12 +100,8 @@ let fire (coord: coordinate) (currentState: state) =
        ships_on_grid = currentState.ships_on_grid}
     | ((r,c),point)::t -> let new_state = fireHelper coord t currShipList in 
       let new_grid = ((r,c),point)::new_state.current_grid in 
-      let new_ship_list = match point with 
-        | Hit s 
-        | Occupied s
-        | Sunk s -> s::new_state.ship_list
-        | _ -> new_state.ship_list in
-      { new_state with ship_list = new_ship_list; current_grid = new_grid}
+
+      { new_state with current_grid = new_grid}
   in fireHelper coord currentState.current_grid currentState.ship_list 
 
 let placing currentState : bool = 
