@@ -74,9 +74,9 @@ let rec curr_sunk_list currShipList outlist =
 let fire (coord: coordinate) (currentState: state) =
   let rec fireHelper coord currGrid currShipList= 
     match currGrid with 
-    | [] -> {ship_list = currShipList; current_grid = currGrid; 
-             sunk_list = curr_sunk_list currShipList [];
-             ships_on_grid = currentState.ships_on_grid}
+    | [] ->  {ship_list = currShipList; current_grid = currGrid; 
+              sunk_list = curr_sunk_list currShipList [];
+              ships_on_grid = currentState.ships_on_grid}
     | ((r,c),Empty)::t when (r,c) = coord -> 
       let update_grid_var = update_grid_empty coord currGrid [] in 
       {ship_list=currShipList; current_grid=update_grid_var;
@@ -94,7 +94,9 @@ let fire (coord: coordinate) (currentState: state) =
       {ship_list=update_ship_list; current_grid=update_grid_var;
        sunk_list = curr_sunk_list update_ship_list [];
        ships_on_grid = currentState.ships_on_grid}
-    | ((_,_),_)::t -> fireHelper coord t currShipList
+    | ((r,c),point)::t -> let new_state = fireHelper coord t currShipList in 
+      let new_grid = ((r,c),point)::new_state.current_grid in
+      { new_state with current_grid = new_grid}
   in fireHelper coord currentState.current_grid currentState.ship_list 
 
 let placing currentState : bool = 
@@ -126,4 +128,4 @@ let queue currentState =
 let rec getAmountSunk lst accum = 
   match lst with
   | [] -> accum
-  | h::t -> getAmountSunk t (accum + 1)
+  | h::t -> getAmountSunk t (accum + 1) 
