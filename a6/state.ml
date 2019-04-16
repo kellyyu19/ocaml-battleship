@@ -37,7 +37,7 @@ let place (ship:ship) (coordOne:coordinate) (coordTwo:coordinate) (state:state) 
     {ship_list=init_ships; current_grid = Battleship.make_grid ship coords state.current_grid [];
      sunk_list=[]; ships_on_grid=ship::state.ships_on_grid}
   else if (fst coordOne = fst coordTwo && Pervasives.abs (snd coordOne - snd coordTwo) = ship.size - 1)
-  then 
+  then
     let coords = Battleship.make_new_int_list (fst coordOne) columns (snd coordOne) (snd coordTwo) [] in 
     {ship_list=init_ships; current_grid = Battleship.make_grid ship coords state.current_grid [];
      sunk_list=[]; ships_on_grid=ship::state.ships_on_grid}
@@ -53,7 +53,11 @@ let rec new_ship_list ship ship_list outlist : ship list= print_endline "line 46
 let rec update_grid_occupied ship coord (currentGrid:Battleship.grid) outlist = 
   match currentGrid with 
   | [] -> outlist
-  | ((r,c),s)::t  -> if (r,c) = coord then (((r,c),Hit(ship))::outlist) @ t 
+  | ((r,c),s)::t  -> if (r,c) = coord 
+    then 
+      let new_ship = {ship with hits = ship.hits+1} in
+      if new_ship.hits = new_ship.size then (((r,c),Sunk(new_ship))::outlist) @ t 
+      else (((r,c),Hit(new_ship))::outlist) @ t 
     else update_grid_occupied ship coord t (((r,c),s)::outlist)
 
 let rec update_grid_empty coord (currentGrid:Battleship.grid) outlist =
@@ -95,8 +99,13 @@ let fire (coord: coordinate) (currentState: state) =
        sunk_list = curr_sunk_list update_ship_list [];
        ships_on_grid = currentState.ships_on_grid}
     | ((r,c),point)::t -> let new_state = fireHelper coord t currShipList in 
-      let new_grid = ((r,c),point)::new_state.current_grid in
-      { new_state with current_grid = new_grid}
+      let new_grid = ((r,c),point)::new_state.current_grid in 
+      let new_ship_list = match point with 
+        | Hit s 
+        | Occupied s
+        | Sunk s -> s::new_state.ship_list
+        | _ -> new_state.ship_list in
+      { new_state with ship_list = new_ship_list; current_grid = new_grid}
   in fireHelper coord currentState.current_grid currentState.ship_list 
 
 let placing currentState : bool = 
