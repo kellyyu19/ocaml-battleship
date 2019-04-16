@@ -10,8 +10,9 @@ let cmdToTupleFire command =
   | Fire list when (List.length list = 1) -> let coord = List.nth list 0 in 
     if String.length coord = 2 then 
       (String.get coord 0, int_of_char (String.get coord 1) - 48)
-    else 
+    else if String.sub coord 1 2 = "10" then
       (String.get coord 0, 10)
+    else raise Malformed
   | _ -> raise Malformed
 
 let string_to_ship str = 
