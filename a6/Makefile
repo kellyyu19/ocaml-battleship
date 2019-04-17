@@ -31,4 +31,5 @@ docs-private: build
 
 clean:
 	ocamlbuild -clean
+	rm -rf doc.public doc.private battleship.zip
 	

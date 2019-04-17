@@ -189,6 +189,7 @@ let rec getAmountSunk lst accum =
   | [] -> accum
   | h::t -> getAmountSunk t (accum + 1) 
 
+
 (** [winOrNot] is whether or not all ships have sunk in this game. *)
 let winOrNot lst : bool = 
   if List.length lst = 5 then true else false
