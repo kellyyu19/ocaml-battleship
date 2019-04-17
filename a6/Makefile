@@ -14,7 +14,7 @@ play:
 	$(OCAMLBUILD) $(MAIN) && ./$(MAIN)
 
 zip:
-	zip battleship.zip *.ml* _tags Makefile
+	zip battleship.zip *.ml* *.mli* _tags Makefile
 
 docs: docs-public docs-private
 
