@@ -1,38 +1,50 @@
 open Battleship
+
 (**  An instance of a battleship game. *)
 type state = {ship_list: ship list; current_grid: grid; sunk_list: ship list; 
               ships_on_grid: ship list}
+
 (**  [init_battleship] is a new battleship *)
 let init_battleship = {name = Battleship; size = 4; hits = 0}
+
 (**  [init_cruiser] is a new cruiser *)
 let init_cruiser = {name = Cruiser; size = 3; hits = 0}
+
 (**  [init_submarine] is a new submarine *)
 let init_submarine = {name = Submarine; size = 3; hits = 0}
+
 (**  [init_destroyer] is a new destroyer *)
 let init_destroyer = {name = Destroyer; size = 2; hits = 0}
+
 (**  [init_carrier] is a new carrier *)
 let init_carrier = {name = Carrier; size = 2; hits = 0}
+
 (**  [init_ships] is a list containing one of each type of ship, with hits set to 0. *)
 let init_ships = 
   [{name = Battleship; size = 4; hits = 0}; {name = Cruiser; size = 3; hits = 0}; 
    {name = Submarine; size = 3; hits = 0}; {name = Destroyer; size = 2; hits = 0};
    {name = Carrier; size = 2; hits = 0}] 
+
 (** [init_state] is a new state, i.e. a new battleship game. *)
 let init_state : state = {ship_list = init_ships; 
                           current_grid = Battleship.init_grid Battleship.rows 
                               Battleship.columns [];
                           sunk_list = [];
                           ships_on_grid = []}
+
 (** OutOfBounds is raised when the given coordinates are outside of the grid or do not 
     correspond to ship size. *)
 exception OutOfBounds 
+
 (** NotRight is raised when the given coordinates could not possibly make a  ship 
     because they are neither part of the same column nor the same row. *)
 exception NotRight
+
 (** [place ship coordOne coordTwo state] is the new state of the game when 
     [ship] is placed in the grid given by [state]. 
     Raises: NotRight is coordinates are incompatible. 
             OutOfBounds if coordinates are outside of the grid. *)
+
 let place (ship:ship) (coordOne:coordinate) (coordTwo:coordinate) (state:state) = 
   if not ((fst coordOne = fst coordTwo) || (snd coordOne = snd coordTwo)
           || (fst coordOne = fst coordTwo && snd coordOne = snd coordTwo)) 

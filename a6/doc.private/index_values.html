@@ -1,0 +1,296 @@
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of exceptions" rel=Appendix href="index_exceptions.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Battleship" rel="Chapter" href="Battleship.html">
+<link title="Command" rel="Chapter" href="Command.html">
+<link title="State" rel="Chapter" href="State.html">
+<link title="Main" rel="Chapter" href="Main.html">
+<link title="Textgrid" rel="Chapter" href="Textgrid.html"><title>Index of values</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;</div>
+<h1>Index of values</h1>
+<table>
+<tr><td align="left"><div>C</div></td></tr>
+<tr><td><a href="Main.html#VALcmdToCoordOne">cmdToCoordOne</a> [<a href="Main.html">Main</a>]</td>
+<td><div class="info">
+<p><code class="code">cmdToCoordOne command</code> is a (char,int) tuple that takes a command of
+    type Place and converts it into a valid coordinate that is a (char,int) 
+    Raises: <code class="code">Malformed</code> if the command is an invalid Place command.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Main.html#VALcmdToCoordTwo">cmdToCoordTwo</a> [<a href="Main.html">Main</a>]</td>
+<td><div class="info">
+<p><code class="code">cmdToCoordTwo command</code> is a (char,int) tuple that takes a command of
+    type Place and converts it into a valid coordinate that is a (char,int) 
+    Raises: <code class="code">Malformed</code> if the command is an invalid Place command.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Main.html#VALcmdToShip">cmdToShip</a> [<a href="Main.html">Main</a>]</td>
+<td><div class="info">
+<p><code class="code">cmdToShip command</code> converts <code class="code">command</code> into the ship that corresponds 
+    with the <code class="code">command</code>.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Main.html#VALcmdToTupleFire">cmdToTupleFire</a> [<a href="Main.html">Main</a>]</td>
+<td><div class="info">
+<p><code class="code">cmdToTupleFire command</code> is a (char,int) tuple that takes a command of
+    type Fire and converts it into a valid coordinate that is a (char,int) 
+    Raises: <code class="code">Malformed</code> if the command is an invalid Fire command.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Battleship.html#VALcolumns">columns</a> [<a href="Battleship.html">Battleship</a>]</td>
+<td></td></tr>
+<tr><td><a href="State.html#VALcurr_sunk_list">curr_sunk_list</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">curr_sunk_list currShipList outlist</code> is the list of ships that have sunk in
+    the current game.</p>
+
+</div>
+</td></tr>
+<tr><td align="left"><div>F</div></td></tr>
+<tr><td><a href="State.html#VALfire">fire</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">fire coord currentState</code> is the new game state resulting from firing at 
+     the given coordinate.</p>
+
+</div>
+</td></tr>
+<tr><td align="left"><div>G</div></td></tr>
+<tr><td><a href="State.html#VALgetAmountSunk">getAmountSunk</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">getAmountSunk</code> is the number of ships that have sunk in the current game.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Textgrid.html#VALgroup_row">group_row</a> [<a href="Textgrid.html">Textgrid</a>]</td>
+<td></td></tr>
+<tr><td align="left"><div>I</div></td></tr>
+<tr><td><a href="State.html#VALinit_battleship">init_battleship</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">init_battleship</code> is a new battleship</p>
+
+</div>
+</td></tr>
+<tr><td><a href="State.html#VALinit_carrier">init_carrier</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">init_carrier</code> is a new carrier</p>
+
+</div>
+</td></tr>
+<tr><td><a href="State.html#VALinit_cruiser">init_cruiser</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">init_cruiser</code> is a new cruiser</p>
+
+</div>
+</td></tr>
+<tr><td><a href="State.html#VALinit_destroyer">init_destroyer</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">init_destroyer</code> is a new destroyer</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Battleship.html#VALinit_grid">init_grid</a> [<a href="Battleship.html">Battleship</a>]</td>
+<td><div class="info">
+<p><code class="code">init_grid r c outlist</code> is the initial grid that is formed, with all
+    points having the status Empty.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="State.html#VALinit_ships">init_ships</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">init_ships</code> is a list containing one of each type of ship, with hits set to 0.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="State.html#VALinit_state">init_state</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">init_state</code> is a new state, i.e.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="State.html#VALinit_submarine">init_submarine</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">init_submarine</code> is a new submarine</p>
+
+</div>
+</td></tr>
+<tr><td><a href="State.html#VALis_sunk">is_sunk</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">is_sunk ship</code> is whether or not <code class="code">ship</code> is of Sunk status.</p>
+
+</div>
+</td></tr>
+<tr><td align="left"><div>L</div></td></tr>
+<tr><td><a href="Textgrid.html#VALlabeled_row">labeled_row</a> [<a href="Textgrid.html">Textgrid</a>]</td>
+<td></td></tr>
+<tr><td align="left"><div>M</div></td></tr>
+<tr><td><a href="Main.html#VALmain">main</a> [<a href="Main.html">Main</a>]</td>
+<td></td></tr>
+<tr><td><a href="Battleship.html#VALmake_grid">make_grid</a> [<a href="Battleship.html">Battleship</a>]</td>
+<td><div class="info">
+<p><code class="code">make_grid ship ship_coords grid outlist</code> is a grid that is formed 
+    depending on the status of each point.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Battleship.html#VALmake_new_char_list">make_new_char_list</a> [<a href="Battleship.html">Battleship</a>]</td>
+<td><div class="info">
+<p><code class="code">make_new_char_list r c c1 c2 outlist</code> is a list of coordinates, where each
+    coordinate is a tuple of a char between <code class="code">r1</code> and <code class="code">r2</code>,inclusive, and an 
+    integer <code class="code">c</code>.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Battleship.html#VALmake_new_int_list">make_new_int_list</a> [<a href="Battleship.html">Battleship</a>]</td>
+<td><div class="info">
+<p><code class="code">make_new_int_list r c c1 c2 outlist</code> is a list of coordinates, where each
+    coordinate is a tuple of <code class="code">r</code> and an integer between <code class="code">c1</code> and <code class="code">c2</code>, inclusive.</p>
+
+</div>
+</td></tr>
+<tr><td align="left"><div>N</div></td></tr>
+<tr><td><a href="State.html#VALnew_ship_list">new_ship_list</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">new_ship_list ship ship_list outlist</code> is the list of ships resulting from 
+    finding <code class="code">ship</code> in <code class="code">ship_list</code> and incrementing its hit count.</p>
+
+</div>
+</td></tr>
+<tr><td align="left"><div>P</div></td></tr>
+<tr><td><a href="Battleship.html#VALpair">pair</a> [<a href="Battleship.html">Battleship</a>]</td>
+<td><div class="info">
+<p><code class="code">pair r c outlist</code> is a list of points that is formed with a tuple of 
+    a tuple of <code class="code">r</code> and each element of <code class="code">cols</code> and the status Empty.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Command.html#VALparse">parse</a> [<a href="Command.html">Command</a>]</td>
+<td><div class="info">
+<p><code class="code">parse</code> is the command corresponding to the given string of user input.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Command.html#VALparseHelper">parseHelper</a> [<a href="Command.html">Command</a>]</td>
+<td><div class="info">
+<p><code class="code">parseHelper entry</code> is the command corresponding to the given entry phrase.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="State.html#VALplace">place</a> [<a href="State.html">State</a>]</td>
+<td></td></tr>
+<tr><td><a href="State.html#VALplacing">placing</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">placing</code> is whether or not the current game is still in placing mode.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Main.html#VALplay_game">play_game</a> [<a href="Main.html">Main</a>]</td>
+<td></td></tr>
+<tr><td><a href="Main.html#VALplay_game_helper">play_game_helper</a> [<a href="Main.html">Main</a>]</td>
+<td><div class="info">
+<p><code class="code">play_game_helper state_p1 state_p2 turn</code> is the helper function for
+    playing the actual game.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Textgrid.html#VALpoint_compare">point_compare</a> [<a href="Textgrid.html">Textgrid</a>]</td>
+<td></td></tr>
+<tr><td><a href="Textgrid.html#VALprint_row">print_row</a> [<a href="Textgrid.html">Textgrid</a>]</td>
+<td></td></tr>
+<tr><td><a href="Main.html#VALprint_text_grid">print_text_grid</a> [<a href="Main.html">Main</a>]</td>
+<td><div class="info">
+<p><code class="code">print_text_grid state_p1 state_p2</code> prints the grid for both the
+    states of player 1 and player 2.</p>
+
+</div>
+</td></tr>
+<tr><td align="left"><div>Q</div></td></tr>
+<tr><td><a href="State.html#VALqueue">queue</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">queue currentState</code> is a well formatted, pretty string of the list of ships 
+    that still need to be placed.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="State.html#VALqueue_helper">queue_helper</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">queue_helper currentState initships outlist</code> is the list of ships that still
+    need to be placed.</p>
+
+</div>
+</td></tr>
+<tr><td align="left"><div>R</div></td></tr>
+<tr><td><a href="Battleship.html#VALrows">rows</a> [<a href="Battleship.html">Battleship</a>]</td>
+<td></td></tr>
+<tr><td align="left"><div>S</div></td></tr>
+<tr><td><a href="Command.html#VALshave">shave</a> [<a href="Command.html">Command</a>]</td>
+<td><div class="info">
+<p><code class="code">shave entry acc</code> is entry with all "" elements removed.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="State.html#VALsink_ship">sink_ship</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">sink_ship ship currentGrid outlist</code> is the grid that has located <code class="code">ship</code> 
+    and changed every point representing <code class="code">ship</code> to the Sunk status.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Textgrid.html#VALsort_and_group_rows">sort_and_group_rows</a> [<a href="Textgrid.html">Textgrid</a>]</td>
+<td></td></tr>
+<tr><td><a href="Textgrid.html#VALsort_row">sort_row</a> [<a href="Textgrid.html">Textgrid</a>]</td>
+<td></td></tr>
+<tr><td><a href="State.html#VALstring_of_ships">string_of_ships</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">string_of_ships</code> is a string of the names of each type of ship.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="Main.html#VALstring_to_ship">string_to_ship</a> [<a href="Main.html">Main</a>]</td>
+<td><div class="info">
+<p><code class="code">string_to_ship str</code> converts the string that represents a ship to 
+    its corresponding ship.</p>
+
+</div>
+</td></tr>
+<tr><td align="left"><div>T</div></td></tr>
+<tr><td><a href="Textgrid.html#VALtext_grid">text_grid</a> [<a href="Textgrid.html">Textgrid</a>]</td>
+<td></td></tr>
+<tr><td align="left"><div>U</div></td></tr>
+<tr><td><a href="State.html#VALupdate_grid_empty">update_grid_empty</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">upgrade_grid_empty coord currentGrid outlist</code> is <code class="code">currentGrid</code>
+    with the point at the given coordinate changed from Empty status to Miss status.</p>
+
+</div>
+</td></tr>
+<tr><td><a href="State.html#VALupdate_grid_occupied">update_grid_occupied</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">upgrade_grid_occupied ship coord state currentGrid outlist</code> is <code class="code">currentGrid</code>
+    with points containing <code class="code">ship</code> changed from Occupied status to Hit status.</p>
+
+</div>
+</td></tr>
+<tr><td align="left"><div>W</div></td></tr>
+<tr><td><a href="State.html#VALwinOrNot">winOrNot</a> [<a href="State.html">State</a>]</td>
+<td><div class="info">
+<p><code class="code">winOrNot</code> is whether or not all ships have sunk in this game.</p>
+
+</div>
+</td></tr>
+</table>
+</body>
+</html>
