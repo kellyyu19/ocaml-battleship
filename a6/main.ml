@@ -178,5 +178,5 @@ let main () =
   print_string ">>>";
   let start = read_line () in play_game start 
 
-
+(** Executes the game engine. *)
 let () = main ()
