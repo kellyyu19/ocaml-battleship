@@ -124,33 +124,41 @@ let rec play_game_helper state_p1 state_p2 turn =
          print_text_grid state_p1 state_p2;
          play_game_helper state_p1 (place ship coordOne coordTwo state_p2) turn)
     else 
-      (ANSITerminal.(print_string [blue] 
-                       ("\n The game has now started. \nTo fire, type \"fire [coordinate]\" \nTo see how many ships you have sunk, type \"status\"" 
-                        ^ if turn then "\n Player 1, make a move.\n >"
-                        else "\n Player 2, make a move.\n >"))); 
+      (ANSITerminal.
+         (print_string [blue] 
+            ("\n The game has now started. \nTo fire, type \"fire [coordinate]\" \nTo see how many ships you have sunk, type \"status\"" 
+             ^ if turn then "\n Player 1, make a move.\n >"
+             else "\n Player 2, make a move.\n >"))); 
 
     let userInput  = parse (read_line ()) in
     match userInput with 
     | Fire coord -> 
-      let new_state = fire (cmdToTupleFire userInput) (if turn then state_p2 else state_p1) in 
-      (if turn && new_state = state_p2 then (print_text_grid state_p1 state_p2; print_endline "\n Nothing has happened. Try again.";
-                                             play_game_helper state_p1 state_p2 turn)
+      let new_state = fire (cmdToTupleFire userInput) 
+          (if turn then state_p2 else state_p1) in 
+      (if turn && new_state = state_p2 
+       then (print_text_grid state_p1 state_p2; 
+             print_endline "\n Nothing has happened. Try again.";
+             play_game_helper state_p1 state_p2 turn)
        else if turn 
        then (print_text_grid state_p1 new_state; 
              print_endline "Successful fire"; 
-             if winOrNot new_state.sunk_list then (print_endline "Player 1 has won."; exit 0)
-             else 
-               play_game_helper state_p1 new_state (not turn))
-       else if new_state = state_p1 then (print_text_grid state_p1 state_p2; print_endline "\n Nothing has happened. Try again.";
-                                          play_game_helper state_p1 state_p2 turn)
+             if winOrNot new_state.sunk_list 
+             then (print_endline "Player 1 has won."; exit 0)
+             else play_game_helper state_p1 new_state (not turn))
+       else if new_state = state_p1 
+       then (print_text_grid state_p1 state_p2; 
+             print_endline "\n Nothing has happened. Try again.";
+             play_game_helper state_p1 state_p2 turn)
        else print_text_grid new_state state_p2; 
        print_endline "Successful fire";
-       if winOrNot new_state.sunk_list then (print_endline "Player 2 has won."; exit 0)
-       else  
-         play_game_helper new_state state_p2 (not turn))
-    | Status -> print_endline ("You have sunk: " ^ 
-                               (string_of_int (if turn then getAmountSunk state_p2.sunk_list 0 
-                                               else getAmountSunk state_p1.sunk_list 0)));
+       if winOrNot new_state.sunk_list 
+       then (print_endline "Player 2 has won."; exit 0)
+       else play_game_helper new_state state_p2 (not turn))
+    | Status -> print_endline 
+                  ("You have sunk: " ^ 
+                   (string_of_int (if turn 
+                                   then getAmountSunk state_p2.sunk_list 0 
+                                   else getAmountSunk state_p1.sunk_list 0)));
       play_game_helper state_p1 state_p2 turn
     | Quit -> print_endline "Goodbye!"; exit 0
     | Place ship-> print_endline "\n All ships have already been placed";
