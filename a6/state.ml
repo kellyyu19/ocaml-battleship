@@ -47,7 +47,7 @@ exception NotRight
 
 let place (ship:ship) (coordOne:coordinate) (coordTwo:coordinate) (state:state) = 
   if (fst(coordOne) > 'j' || snd(coordOne) > 10) || 
-     (fst(coordOne) > 'j' || snd(coordOne) > 10) then raise OutOfBounds 
+     (fst(coordTwo) > 'j' || snd(coordTwo) > 10) then raise OutOfBounds 
 
   else if not ((fst coordOne = fst coordTwo) || (snd coordOne = snd coordTwo)
                || (fst coordOne = fst coordTwo && snd coordOne = snd coordTwo)) 
