@@ -46,8 +46,11 @@ exception NotRight
             OutOfBounds if coordinates are outside of the grid. *)
 
 let place (ship:ship) (coordOne:coordinate) (coordTwo:coordinate) (state:state) = 
-  if not ((fst coordOne = fst coordTwo) || (snd coordOne = snd coordTwo)
-          || (fst coordOne = fst coordTwo && snd coordOne = snd coordTwo)) 
+  if (fst(coordOne) > 'j' || snd(coordOne) > 10) || 
+     (fst(coordOne) > 'j' || snd(coordOne) > 10) then raise OutOfBounds 
+
+  else if not ((fst coordOne = fst coordTwo) || (snd coordOne = snd coordTwo)
+               || (fst coordOne = fst coordTwo && snd coordOne = snd coordTwo)) 
   then raise NotRight
   else if (snd coordOne = snd coordTwo && 
            Pervasives.abs (Char.code (fst coordOne) 

@@ -2,6 +2,7 @@ MODULES=battleship command state main textgrid
 OBJECTS=$(MODULES:=.cmo)
 MLS=$(MODULES:=.ml)
 MAIN=main.byte
+TEST=test.byte
 OCAMLBUILD=ocamlbuild -use-ocamlfind
 
 default: build
@@ -9,6 +10,9 @@ default: build
 
 build:
 	$(OCAMLBUILD) $(OBJECTS)
+
+test:
+	$(OCAMLBUILD) -tag 'debug' $(TEST) && ./$(TEST)
 
 play:
 	$(OCAMLBUILD) $(MAIN) && ./$(MAIN)
