@@ -130,7 +130,8 @@ let rec play_game_helper state_p1 state_p2 turn =
     else 
       (ANSITerminal.
          (print_string [blue] 
-            ("\n The game has now started. \nTo fire, type \"fire [coordinate]\" \nTo see how many ships you have sunk, type \"status\"" 
+            ("\n The game has now started. \nTo fire, type \"fire [coordinate]\""^
+             " \nTo see how many ships you have sunk, type \"status\"" 
              ^ if turn then "\n Player 1, make a move.\n >"
              else "\n Player 2, make a move.\n >"))); 
 
@@ -203,7 +204,8 @@ let rec solo_game_helper state_p1 state_AI =
     else 
       (ANSITerminal.
          (print_string [blue] 
-            ("\n The game has now started. \nTo fire, type \"fire [coordinate]\" \nTo see how many ships you have sunk, type \"status\"" 
+            ("\n The game has now started. \nTo fire, type \"fire [coordinate]"^
+             "\" \nTo see how many ships you have sunk, type \"status\"" 
              ^ "\n Player 1, make a move.\n >")); 
 
        let userInput  = parse (read_line ()) in
@@ -219,12 +221,16 @@ let rec solo_game_helper state_p1 state_AI =
             print_endline "Shot fired."; 
             if winOrNot new_state.sunk_list 
             then (print_endline "Player 1 has won."; exit 0)
-            else solo_game_helper state_p1 new_state) (* write helper that calls fire for AI and replace state_p1 with result from helper. print grid in this helper.*)
+            else solo_game_helper state_p1 new_state) 
+       (* write helper that calls fire for AI and replace state_p1 with result from helper. print grid in this helper.
+       *)
 
-       | Status -> print_endline 
-                     ("You have sunk: " ^ 
-                      (string_of_int (getAmountSunk state_AI.sunk_list 0)) ^  
-                      "\nYou have lost " ^ (string_of_int (getAmountSunk state_p1.sunk_list 0)) ^ " ships.\n");
+       | Status -> 
+         print_endline 
+           ("You have sunk: " ^ 
+            (string_of_int (getAmountSunk state_AI.sunk_list 0)) ^  
+            "\nYou have lost " ^ 
+            (string_of_int (getAmountSunk state_p1.sunk_list 0)) ^ " ships.\n");
          solo_game_helper state_p1 state_AI 
        | Quit -> print_endline "Goodbye!"; exit 0
        | Place ship-> print_endline "\n All ships have already been placed.";
@@ -236,18 +242,19 @@ let rec solo_game_helper state_p1 state_AI =
     solo_game_helper state_p1 state_AI
   | OutOfBounds -> print_endline "\n These coordinates are out of bound. \n";
     solo_game_helper state_p1 state_AI
-  | NotRight -> print_endline "\n These coordinates are equal. \n";
+  | NotRight -> print_endline "\n These coordinates can not form a ship. \n";
     solo_game_helper state_p1 state_AI
   | ShipHere -> print_endline "\n A ship is already placed here.\n";
     solo_game_helper state_p1 state_AI
-
 
 
 let rec play_game mode = 
   try
     match mode with
     | Versus -> play_game_helper init_state init_state true
-    | Solo -> (solo_game_helper init_state init_state) (* replace second init_state with random placed ai state *)
+    | Solo -> let fresh_state = init_state in 
+      let ai_state = state_builder_AI fresh_state fresh_state.ship_list in 
+      solo_game_helper init_state ai_state
     | Quit -> print_endline "Goodbye!"; exit 0
     | _ -> raise Malformed
   with 

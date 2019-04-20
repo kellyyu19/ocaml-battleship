@@ -228,6 +228,16 @@ let output_AI_coords ship =
   let r_code = Char.code r in 
   make_AI_coords rnd_0_1 r c r_code ship
 
+let rec state_builder_AI (state:state) (ships:ship list) =
+  match ships with
+  | [] -> state
+  | ship::t -> 
+    try 
+      let coords = (output_AI_coords ship) in 
+      state_builder_AI (place ship (fst coords) (snd coords) state) t
+    with 
+    | ShipHere -> state_builder_AI state ships
+
 (** [winOrNot] is whether or not all ships have sunk in this game. *)
 let winOrNot lst : bool = 
   if List.length lst = 5 then true else false
