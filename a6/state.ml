@@ -263,11 +263,11 @@ let pick_adjacent grid (point:Battleship.point) (rowcode: int) s : Battleship.co
   else (generate_rnd_row (), generate_rnd_col ())
 
 
-let rec fire_AI_coords (grid:Battleship.grid) : coordinate = 
+let rec fire_AI_coords (fullgrid: Battleship.grid) (grid:Battleship.grid) : coordinate = 
   match grid with 
   |[] -> (generate_rnd_row (), generate_rnd_col ())
-  |((r,c), Hit(s))::t -> pick_adjacent grid ((r,c), Hit(s)) (Char.code r) s
-  |h::t -> fire_AI_coords t 
+  |((r,c), Hit(s))::t -> pick_adjacent fullgrid ((r,c), Hit(s)) (Char.code r) s
+  |h::t -> fire_AI_coords fullgrid t 
 
 (** [winOrNot] is whether or not all ships have sunk in this game. *)
 let winOrNot lst : bool = 
