@@ -194,6 +194,8 @@ let rec getAmountSunk lst accum =
 
 let generate_0_1 () = 
   Random.int 2
+let generate_0_3 () = 
+  Random.int 4
 
 let generate_rnd_row () = 
   List.nth (Battleship.rows) (Random.int 10) 
@@ -237,6 +239,35 @@ let rec state_builder_AI (state:state) (ships:ship list) =
       state_builder_AI (place ship (fst coords) (snd coords) state) t
     with 
     | ShipHere -> state_builder_AI state ships
+
+let can_fire (point:Battleship.point) = 
+  match point with 
+  | ((r,c), Hit(s)) -> false
+  |((r,c), Sunk(s)) -> false 
+  |((r,c), Miss) -> false 
+  |_ -> true 
+
+let rec get_point (coord:Battleship.coordinate) (grid: Battleship.grid) = 
+  match grid with 
+  |[] -> failwith"coordinate is not in this grid, something is wrong"
+  |h::t -> if fst(h) = coord then h else get_point coord t
+
+let pick_adjacent grid (point:Battleship.point) (rowcode: int) s : Battleship.coordinate = 
+  if generate_0_3 () = 0 && 
+     can_fire (get_point (Char.chr (rowcode - 1) , snd (fst point)) grid) then (Char.chr (rowcode - 1) , snd (fst point))
+  else if generate_0_3 () = 1 && 
+          can_fire (get_point (Char.chr (rowcode + 1) , snd (fst point)) grid) then (Char.chr (rowcode + 1) , snd (fst point)) 
+  else if generate_0_3 () = 2 && 
+          can_fire (get_point ((fst(fst point) , snd(fst point)-1)) grid) then (fst(fst point) , snd(fst point)-1)
+  else if can_fire (get_point ((fst(fst point) , snd(fst point)+1)) grid) then (fst(fst point) , snd(fst point)+1)
+  else (generate_rnd_row (), generate_rnd_col ())
+
+
+let rec fire_AI_coords (grid:Battleship.grid) : coordinate = 
+  match grid with 
+  |[] -> (generate_rnd_row (), generate_rnd_col ())
+  |((r,c), Hit(s))::t -> pick_adjacent grid ((r,c), Hit(s)) (Char.code r) s
+  |h::t -> fire_AI_coords t 
 
 (** [winOrNot] is whether or not all ships have sunk in this game. *)
 let winOrNot lst : bool = 
