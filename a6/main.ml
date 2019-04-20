@@ -221,10 +221,16 @@ let rec solo_game_helper state_p1 state_AI =
             print_endline "Shot fired."; 
             if winOrNot new_state.sunk_list 
             then (print_endline "Player 1 has won."; exit 0)
-            else solo_game_helper state_p1 new_state) 
-       (* write helper that calls fire for AI and replace state_p1 with result from helper. print grid in this helper.
-       *)
-
+            else
+              let rec ai_fire_helper state_p1 state_AI = 
+                let new_state = fire (fire_AI_coords state_p1.current_grid state_p1.current_grid) state_p1 in
+                if (new_state = state_p1) 
+                then ai_fire_helper state_p1 state_AI
+                else (print_text_grid new_state state_AI; new_state) in 
+              let new_p1 = ai_fire_helper state_p1 new_state in 
+              if winOrNot new_p1.sunk_list 
+              then (print_endline "The AI has won."; exit 0)
+              else solo_game_helper new_p1 new_state)
        | Status -> 
          print_endline 
            ("You have sunk: " ^ 
