@@ -104,7 +104,9 @@ let rec play_game_helper state_p1 state_p2 turn =
          let coordOne = cmdToCoordOne command in 
          let coordTwo = cmdToCoordTwo command in 
          print_text_grid state_p1 state_p2;
-         play_game_helper (place ship coordOne coordTwo state_p1) state_p2 turn)
+         play_game_helper (place ship coordOne coordTwo state_p1) state_p2 turn
+       | _ -> raise Malformed)
+
     else if (placing state_p2) then
       (ANSITerminal.
          (print_string [blue] 
@@ -122,7 +124,9 @@ let rec play_game_helper state_p1 state_p2 turn =
          let coordOne = cmdToCoordOne command in 
          let coordTwo = cmdToCoordTwo command in 
          print_text_grid state_p1 state_p2;
-         play_game_helper state_p1 (place ship coordOne coordTwo state_p2) turn)
+         play_game_helper state_p1 (place ship coordOne coordTwo state_p2) turn
+       | _ -> raise Malformed)
+
     else 
       (ANSITerminal.
          (print_string [blue] 
@@ -141,7 +145,7 @@ let rec play_game_helper state_p1 state_p2 turn =
              play_game_helper state_p1 state_p2 turn)
        else if turn 
        then (print_text_grid state_p1 new_state; 
-             print_endline "Successful fire"; 
+             print_endline "Shot fired."; 
              if winOrNot new_state.sunk_list 
              then (print_endline "Player 1 has won."; exit 0)
              else play_game_helper state_p1 new_state (not turn))
@@ -150,7 +154,7 @@ let rec play_game_helper state_p1 state_p2 turn =
              print_endline "\n Nothing has happened. Try again.";
              play_game_helper state_p1 state_p2 turn)
        else print_text_grid new_state state_p2; 
-       print_endline "Successful fire";
+       print_endline "Shot fired.";
        if winOrNot new_state.sunk_list 
        then (print_endline "Player 2 has won."; exit 0)
        else play_game_helper new_state state_p2 (not turn))
@@ -163,6 +167,7 @@ let rec play_game_helper state_p1 state_p2 turn =
     | Quit -> print_endline "Goodbye!"; exit 0
     | Place ship-> print_endline "\n All ships have already been placed";
       play_game_helper state_p1 state_p2 turn  
+    | _ -> raise Malformed
 
   with 
   | Malformed -> print_endline "\n That was not a valid command.\n";
@@ -174,17 +179,89 @@ let rec play_game_helper state_p1 state_p2 turn =
   | ShipHere -> print_endline "\n A ship is already placed here.\n";
     play_game_helper state_p1 state_p2 turn
 
+let rec solo_game_helper state_p1 state_AI = 
+  try
+    if (placing state_p1) then 
+      (ANSITerminal.
+         (print_string [blue] 
+            ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
+            \nFor example, \"place carrier a1 a2\"
+            \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4. 
+            \nPlayer 1, please place your next ship. Ships remaining: " ^ queue state_p1 ^ "\n\n>"));
+       let command = parse (read_line ()) in 
+       match command with 
+       | Quit -> print_endline "Goodbye!"; exit 0
+       | Fire coord -> raise Malformed
+       | Status -> raise Malformed
+       | Place ship -> 
+         let ship = cmdToShip command in 
+         let coordOne = cmdToCoordOne command in 
+         let coordTwo = cmdToCoordTwo command in 
+         print_text_grid state_p1 state_AI;
+         solo_game_helper (place ship coordOne coordTwo state_p1) state_AI
+       | _ -> raise Malformed)
+    else 
+      (ANSITerminal.
+         (print_string [blue] 
+            ("\n The game has now started. \nTo fire, type \"fire [coordinate]\" \nTo see how many ships you have sunk, type \"status\"" 
+             ^ "\n Player 1, make a move.\n >")); 
+
+       let userInput  = parse (read_line ()) in
+       match userInput with 
+       | Fire coord -> 
+         let new_state = fire (cmdToTupleFire userInput) state_AI  in 
+         if (new_state = state_AI) 
+         then (print_text_grid state_p1 state_AI; 
+               print_endline "\n Nothing has happened. Try again.";
+               solo_game_helper state_p1 state_AI)
+         else 
+           (print_text_grid state_p1 new_state; 
+            print_endline "Shot fired."; 
+            if winOrNot new_state.sunk_list 
+            then (print_endline "Player 1 has won."; exit 0)
+            else solo_game_helper state_p1 new_state) (* write helper that calls fire for AI and replace state_p1 with result from helper. print grid in this helper.*)
+
+       | Status -> print_endline 
+                     ("You have sunk: " ^ 
+                      (string_of_int (getAmountSunk state_AI.sunk_list 0)) ^  
+                      "\nYou have lost " ^ (string_of_int (getAmountSunk state_p1.sunk_list 0)) ^ " ships.\n");
+         solo_game_helper state_p1 state_AI 
+       | Quit -> print_endline "Goodbye!"; exit 0
+       | Place ship-> print_endline "\n All ships have already been placed.";
+         solo_game_helper state_p1 state_AI 
+       | _ -> raise Malformed)
+
+  with 
+  | Malformed -> print_endline "\n That was not a valid command.\n";
+    solo_game_helper state_p1 state_AI
+  | OutOfBounds -> print_endline "\n These coordinates are out of bound. \n";
+    solo_game_helper state_p1 state_AI
+  | NotRight -> print_endline "\n These coordinates are equal. \n";
+    solo_game_helper state_p1 state_AI
+  | ShipHere -> print_endline "\n A ship is already placed here.\n";
+    solo_game_helper state_p1 state_AI
 
 
-let play_game start = 
-  play_game_helper init_state init_state true
+
+let rec play_game mode = 
+  try
+    match mode with
+    | Versus -> play_game_helper init_state init_state true
+    | Solo -> (solo_game_helper init_state init_state) (* replace second init_state with random placed ai state *)
+    | Quit -> print_endline "Goodbye!"; exit 0
+    | _ -> raise Malformed
+  with 
+  | Malformed -> print_endline 
+                   "\n Please enter a valid gamemode.\n ~Versus\n ~Solo\n";
+    print_string ">>>";
+    play_game (parse (read_line ()))
 
 
 let main () = 
   ANSITerminal.print_string [ANSITerminal.Foreground Blue] "\n Battleship\n";
-  print_endline "\n Please type start to play a new game.\n ";
+  print_endline "\n Choose a game mode \n\n ~Versus\n ~Solo ";
   print_string ">>>";
-  let start = read_line () in play_game start 
+  let mode = parse (read_line ()) in play_game mode 
 
 (** Executes the game engine. *)
 let () = main ()
