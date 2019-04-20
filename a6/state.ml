@@ -192,6 +192,41 @@ let rec getAmountSunk lst accum =
   | [] -> accum
   | h::t -> getAmountSunk t (accum + 1) 
 
+let generate_0_1 () = 
+  Random.int 2
+
+let generate_rnd_row () = 
+  List.nth (Battleship.rows) (Random.int 10) 
+
+let generate_rnd_col () = 
+  List.nth (Battleship.columns) (Random.int 10)
+
+let int_choice elt1 elt2 = 
+  if (elt1 > 10 || elt1 < 0) && not (elt2 > 10 || elt2 < 0) then elt2 
+  else if (elt2 > 10 || elt2 < 0) && not (elt1 > 10 || elt1 < 0) then elt1 
+  else if generate_0_1 () = 1 then elt1 
+  else elt2
+
+let char_choice  elt1 elt2 = 
+  if ('a' < elt1 && elt1 < 'j') && not ('a' < elt2 && elt2 < 'j') then elt1 
+  else if ('a' < elt2 && elt2 < 'j') && not ('a' < elt1 && elt1 < 'j') then elt2 
+  else if generate_0_1 () = 1 then elt1 
+  else elt2
+
+
+let make_AI_coords decider (row: char) col rowcode (ship:Battleship.ship) = 
+  if decider = 0 then 
+    ( (row,col), (row,  (int_choice (col - ship.size + 1) (col + ship.size - 1))))  
+  else 
+    ( (row,col), (char_choice (Char.chr (rowcode - ship.size + 1 )) (Char.chr (rowcode + ship.size - 1)),col)  )
+
+
+let output_AI_coords ship = 
+  let rnd_0_1 = generate_0_1 () in
+  let c = generate_rnd_col () in
+  let r = generate_rnd_row () in 
+  let r_code = Char.code r in 
+  make_AI_coords rnd_0_1 r c r_code ship
 
 (** [winOrNot] is whether or not all ships have sunk in this game. *)
 let winOrNot lst : bool = 

@@ -100,7 +100,6 @@ let command_tests =
                              (fun () -> parse ("place       ") ));
   ]
 
-
 let suite =
   "test suite for A2"  >::: List.flatten [
     state_tests;
