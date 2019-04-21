@@ -107,8 +107,10 @@ let rec play_game_helper state_p1 state_p2 turn =
          let ship = cmdToShip command in 
          let coordOne = cmdToCoordOne command in 
          let coordTwo = cmdToCoordTwo command in 
-         print_text_grid state_p1 state_p2 true false;
-         play_game_helper (place ship coordOne coordTwo state_p1) state_p2 turn
+         let safeCoords = sort_tuple (coordOne,coordTwo) in
+         let new_state = (place ship (fst safeCoords) (snd safeCoords) state_p1) in
+         print_text_grid new_state state_p2 true false;
+         play_game_helper new_state state_p2 turn
        | _ -> raise Malformed)
 
     else if (placing state_p2) then
@@ -131,8 +133,11 @@ let rec play_game_helper state_p1 state_p2 turn =
          let ship = cmdToShip command in 
          let coordOne = cmdToCoordOne command in 
          let coordTwo = cmdToCoordTwo command in 
+         let safeCoords = sort_tuple (coordOne,coordTwo) in
+         let new_state = (place ship (fst safeCoords) (snd safeCoords) state_p2) in
          print_text_grid state_p1 state_p2 false true;
-         play_game_helper state_p1 (place ship coordOne coordTwo state_p2) turn
+         print_text_grid state_p1 new_state false true;
+         play_game_helper state_p1 new_state turn
        | _ -> raise Malformed)
 
     else 
@@ -211,8 +216,9 @@ let rec solo_game_helper state_p1 state_AI =
          let ship = cmdToShip command in 
          let coordOne = cmdToCoordOne command in 
          let coordTwo = cmdToCoordTwo command in 
-         let new_state = (place ship coordOne coordTwo state_p1) in
-         print_text_grid new_state state_AI true true;
+         let safeCoords = sort_tuple (coordOne,coordTwo) in
+         let new_state = (place ship (fst safeCoords) (snd safeCoords) state_p1) in
+         print_text_grid new_state state_AI true false;
          solo_game_helper new_state state_AI
        | _ -> raise Malformed)
     else 
