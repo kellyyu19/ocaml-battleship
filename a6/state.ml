@@ -250,19 +250,19 @@ let can_fire (point:Battleship.point) =
   |((r,c), Miss) -> false 
   |_ -> true 
 
-let rec get_point (coord:Battleship.coordinate) (grid: Battleship.grid) = 
+let rec get_point (coord:Battleship.coordinate) (grid: Battleship.grid) (fullgrid:Battleship.grid)= 
   match grid with 
-  |[] -> failwith"coordinate is not in this grid, something is wrong"
-  |h::t -> if fst(h) = coord then h else get_point coord t
+  |[] -> List.nth fullgrid (Random.int 101)
+  |h::t -> if fst(h) = coord then h else get_point coord t fullgrid
 
 let pick_adjacent grid (point:Battleship.point) (rowcode: int) s : Battleship.coordinate = 
   if generate_0_3 () = 0 && 
-     can_fire (get_point (Char.chr (rowcode - 1) , snd (fst point)) grid) then (Char.chr (rowcode - 1) , snd (fst point))
+     can_fire (get_point (Char.chr (rowcode - 1) , snd (fst point)) grid grid) then (Char.chr (rowcode - 1) , snd (fst point))
   else if generate_0_3 () = 1 && 
-          can_fire (get_point (Char.chr (rowcode + 1) , snd (fst point)) grid) then (Char.chr (rowcode + 1) , snd (fst point)) 
+          can_fire (get_point (Char.chr (rowcode + 1) , snd (fst point)) grid grid) then (Char.chr (rowcode + 1) , snd (fst point)) 
   else if generate_0_3 () = 2 && 
-          can_fire (get_point ((fst(fst point) , snd(fst point)-1)) grid) then (fst(fst point) , snd(fst point)-1)
-  else if can_fire (get_point ((fst(fst point) , snd(fst point)+1)) grid) then (fst(fst point) , snd(fst point)+1)
+          can_fire (get_point ((fst(fst point) , snd(fst point)-1)) grid grid) then (fst(fst point) , snd(fst point)-1)
+  else if can_fire (get_point ((fst(fst point) , snd(fst point)+1)) grid grid) then (fst(fst point) , snd(fst point)+1)
   else (generate_rnd_row (), generate_rnd_col ())
 
 
