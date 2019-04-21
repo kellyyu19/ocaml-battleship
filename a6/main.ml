@@ -193,10 +193,10 @@ let rec solo_game_helper state_p1 state_AI =
     if (placing state_p1) then 
       (ANSITerminal.
          (print_string [blue] 
-            ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
+            ("If you want to place all the ships randomly, type \"random\" , (you must use this before placing any ships.)
+            \nTo place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
             \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4. 
-            \nIf you want to place randomly, type \"random\", (you must use this before placing any ships.)
             \nPlayer 1, please place your next ship. Ships remaining: " ^ queue state_p1 ^ "\n\n>"));
        let command = parse (read_line ()) in 
        match command with 
@@ -205,13 +205,14 @@ let rec solo_game_helper state_p1 state_AI =
        | Status -> raise Malformed
        | PlaceRandom ->  if (List.length state_p1.ships_on_grid )>0 then raise Malformed else 
            let new_state = state_builder_AI state_p1 state_p1.ship_list in 
+           print_text_grid new_state state_AI true true;
            solo_game_helper new_state state_AI
        | Place ship -> 
          let ship = cmdToShip command in 
          let coordOne = cmdToCoordOne command in 
          let coordTwo = cmdToCoordTwo command in 
          let new_state = (place ship coordOne coordTwo state_p1) in
-         print_text_grid new_state state_AI true false;
+         print_text_grid new_state state_AI true true;
          solo_game_helper new_state state_AI
        | _ -> raise Malformed)
     else 
