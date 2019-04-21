@@ -217,7 +217,7 @@ let rec solo_game_helper state_p1 state_AI =
        | Status -> raise Malformed
        | PlaceRandom ->  if (List.length state_p1.ships_on_grid )>0 then raise Malformed else 
            let new_state = state_builder_AI state_p1 state_p1.ship_list in 
-           print_text_grid new_state state_AI true true;
+           print_text_grid new_state state_AI true false;
            solo_game_helper new_state state_AI
        | Place ship -> 
          let ship = cmdToShip command in 

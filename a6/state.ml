@@ -86,20 +86,28 @@ let rec new_ship_list ship ship_list outlist : ship list=
 let rec sink_ship ship (currentGrid:Battleship.grid) outlist = 
   match currentGrid with 
   |[] -> outlist 
-  |((r,c),s)::t when s = Hit(ship) || s = Occupied(ship)  ->
-    sink_ship ship t (((r,c),Sunk(ship))::outlist)
+  |((r,c),Hit({name=nm;size=sz;hits=hts}))::t when ship.name = nm -> 
+    sink_ship ship t (((r,c),Sunk(ship))::outlist) 
   |((r,c),s)::t -> sink_ship ship t (((r,c),s)::outlist)
 
-(** [upgrade_grid_occupied ship coord state currentGrid outlist] is [currentGrid]
-    with points containing [ship] changed from Occupied status to Hit status. *)
+let rec hit_ship ship (currentGrid:Battleship.grid) r' c' outlist : Battleship.grid = 
+  match currentGrid with 
+  |[] -> outlist 
+  |((r,c),Occupied({name=nm;size=sz;hits=hts}))::t when (ship.name = nm && r'<>r &&c'<>c) -> 
+    hit_ship ship t r' c' (((r,c),Occupied({ship with hits=hts+1}))::outlist)
+  |((r,c),Occupied({name=nm;size=sz;hits=hts}))::t when (ship.name = nm && r'=r &&c'=c) -> 
+    hit_ship ship t r' c' (((r,c),Hit({ship with hits=hts+1}))::outlist)
+  |((r,c),Hit({name=nm;size=sz;hits=hts}))::t when ship.name = nm -> 
+    hit_ship ship t r' c' (((r,c),Hit({ship with hits=ship.hits+1}))::outlist)
+  |((r,c),s)::t -> hit_ship ship t r' c' (((r,c),s)::outlist)
+
 let rec update_grid_occupied ship coord state (currentGrid:Battleship.grid) outlist = 
   match currentGrid with 
   | [] -> outlist
   | ((r,c),s)::t  -> if (r,c) = coord 
     then 
-      let new_ship = {ship with hits = ship.hits+1} in
-      if new_ship.hits = new_ship.size then sink_ship ship state.current_grid []
-      else (((r,c),Hit(new_ship))::outlist) @ t 
+      if ship.hits+1 = ship.size then (print_endline "sink 74"; sink_ship ship (hit_ship ship currentGrid r c []) [])
+      else hit_ship ship currentGrid r c [] 
     else update_grid_occupied ship coord state t (((r,c),s)::outlist)
 
 (** [upgrade_grid_empty coord currentGrid outlist] is [currentGrid]
