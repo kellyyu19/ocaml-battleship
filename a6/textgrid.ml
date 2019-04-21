@@ -21,27 +21,28 @@ let rec sort_and_group_rows rows (grid:Battleship.grid) outlist =
   |h::t -> sort_and_group_rows t grid ((sort_row(group_row h grid []))::outlist)
 
 
-let rec print_row sortedrow outstring = 
+let rec print_row sortedrow outstring ship_vis= 
   match sortedrow with 
   |[]-> outstring
-  |((r,c),Hit(s))::t -> print_row t (outstring ^ "*     ") 
-  |((r,c),Sunk(s))::t -> print_row t (outstring ^ "/     ") 
-  |((r,c),Empty)::t -> print_row t (outstring ^ "-     ") 
-  |((r,c),Occupied(s))::t -> print_row t (outstring ^ "-     ")
-  |((r,c),Miss)::t -> print_row t (outstring ^ "x     ")
+  |((r,c),Hit(s))::t -> print_row t (outstring ^ "*     ") ship_vis
+  |((r,c),Sunk(s))::t -> print_row t (outstring ^ "/     ") ship_vis
+  |((r,c),Empty)::t -> print_row t (outstring ^ "-     ") ship_vis
+  |((r,c),Occupied(s))::t when ship_vis -> print_row t (outstring ^ "o     ") ship_vis
+  |((r,c),Occupied(s))::t -> print_row t (outstring ^ "-     ") ship_vis
+  |((r,c),Miss)::t -> print_row t (outstring ^ "x     ") ship_vis
 
 
-let labeled_row sortedrow = 
+let labeled_row sortedrow ship_vis : string = 
   match sortedrow with 
   |[]-> ""
-  |((r,_),_)::t -> ((Char.escaped r) ^"       "^ (print_row sortedrow ""))
+  |((r,_),_)::t -> ((Char.escaped r) ^"       "^ (print_row sortedrow "" ship_vis))
 
 
-let rec text_grid (rowlist:Battleship.point list list) outstring = 
+let rec text_grid (rowlist:Battleship.point list list) outstring ship_vis = 
   match rowlist with
   |[]->  (
       "        1     2     3     4     5     6     7     8     9     10" 
       ^"\n"^ outstring)
-  |h::t -> text_grid t (outstring ^"\n"^"\n"^ labeled_row h)
+  |h::t -> text_grid t (outstring ^"\n"^"\n"^ (labeled_row h ship_vis)) ship_vis
 
 

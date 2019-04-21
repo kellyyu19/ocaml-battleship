@@ -69,13 +69,13 @@ let cmdToCoordTwo command =
 
 (** [print_text_grid state_p1 state_p2] prints the grid for both the
     states of player 1 and player 2.*)
-let print_text_grid state_p1 state_p2 = 
+let print_text_grid state_p1 state_p2 ship_vis1 ship_vis2= 
   print_endline ("Player 1's Ships':" ^"\n"^
                  (Textgrid.text_grid 
                     (Textgrid.sort_and_group_rows 
-                       (List.rev Battleship.rows) (state_p1.current_grid) []) "")); 
+                       (List.rev Battleship.rows) (state_p1.current_grid) []) "" ship_vis1)); 
   print_endline ("Player 2's Ships':" ^"\n"^
-                 (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p2.current_grid) []) "")); ()
+                 (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p2.current_grid) []) "" ship_vis2)); ()
 
 (** [play_game_helper state_p1 state_p2 turn] is the helper function for
     playing the actual game. It takes care of placing the ships, changing 
@@ -103,7 +103,7 @@ let rec play_game_helper state_p1 state_p2 turn =
          let ship = cmdToShip command in 
          let coordOne = cmdToCoordOne command in 
          let coordTwo = cmdToCoordTwo command in 
-         print_text_grid state_p1 state_p2;
+         print_text_grid state_p1 state_p2 true false;
          play_game_helper (place ship coordOne coordTwo state_p1) state_p2 turn
        | _ -> raise Malformed)
 
@@ -123,7 +123,7 @@ let rec play_game_helper state_p1 state_p2 turn =
          let ship = cmdToShip command in 
          let coordOne = cmdToCoordOne command in 
          let coordTwo = cmdToCoordTwo command in 
-         print_text_grid state_p1 state_p2;
+         print_text_grid state_p1 state_p2 false true;
          play_game_helper state_p1 (place ship coordOne coordTwo state_p2) turn
        | _ -> raise Malformed)
 
@@ -141,20 +141,20 @@ let rec play_game_helper state_p1 state_p2 turn =
       let new_state = fire (cmdToTupleFire userInput) 
           (if turn then state_p2 else state_p1) in 
       (if turn && new_state = state_p2 
-       then (print_text_grid state_p1 state_p2; 
+       then (print_text_grid state_p1 state_p2 false false; 
              print_endline "\n Nothing has happened. Try again.";
              play_game_helper state_p1 state_p2 turn)
        else if turn 
-       then (print_text_grid state_p1 new_state; 
+       then (print_text_grid state_p1 new_state false false; 
              print_endline "Shot fired."; 
              if winOrNot new_state.sunk_list 
              then (print_endline "Player 1 has won."; exit 0)
              else play_game_helper state_p1 new_state (not turn))
        else if new_state = state_p1 
-       then (print_text_grid state_p1 state_p2; 
+       then (print_text_grid state_p1 state_p2 false false; 
              print_endline "\n Nothing has happened. Try again.";
              play_game_helper state_p1 state_p2 turn)
-       else print_text_grid new_state state_p2; 
+       else print_text_grid new_state state_p2 false false; 
        print_endline "Shot fired.";
        if winOrNot new_state.sunk_list 
        then (print_endline "Player 2 has won."; exit 0)
@@ -198,8 +198,9 @@ let rec solo_game_helper state_p1 state_AI =
          let ship = cmdToShip command in 
          let coordOne = cmdToCoordOne command in 
          let coordTwo = cmdToCoordTwo command in 
-         print_text_grid state_p1 state_AI;
-         solo_game_helper (place ship coordOne coordTwo state_p1) state_AI
+         let new_state = (place ship coordOne coordTwo state_p1) in
+         print_text_grid new_state state_AI true false;
+         solo_game_helper new_state state_AI
        | _ -> raise Malformed)
     else 
       (ANSITerminal.
@@ -213,11 +214,11 @@ let rec solo_game_helper state_p1 state_AI =
        | Fire coord -> 
          let new_state = fire (cmdToTupleFire userInput) state_AI  in 
          if (new_state = state_AI) 
-         then (print_text_grid state_p1 state_AI; 
+         then (print_text_grid state_p1 state_AI true false; 
                print_endline "\n Nothing has happened. Try again.";
                solo_game_helper state_p1 state_AI)
          else 
-           (print_text_grid state_p1 new_state; 
+           (print_text_grid state_p1 new_state true false; 
             print_endline "Shot fired."; 
             if winOrNot new_state.sunk_list 
             then (print_endline "Player 1 has won."; exit 0)
@@ -226,7 +227,7 @@ let rec solo_game_helper state_p1 state_AI =
                 let new_state = fire (fire_AI_coords state_p1.current_grid state_p1.current_grid) state_p1 in
                 if (new_state = state_p1) 
                 then ai_fire_helper state_p1 state_AI
-                else (print_text_grid new_state state_AI; new_state) in 
+                else (print_text_grid new_state state_AI true false; new_state) in 
               let new_p1 = ai_fire_helper state_p1 new_state in 
               if winOrNot new_p1.sunk_list 
               then (print_endline "The AI has won."; exit 0)

@@ -230,15 +230,18 @@ let output_AI_coords ship =
   let r_code = Char.code r in 
   make_AI_coords rnd_0_1 r c r_code ship
 
-let rec state_builder_AI (state:state) (ships:ship list) =
+let rec state_builder_AI (currState:state) (ships:ship list) =
   match ships with
-  | [] -> state
+  | [] -> currState
   | ship::t -> 
     try 
       let coords = (output_AI_coords ship) in 
-      state_builder_AI (place ship (fst coords) (snd coords) state) t
+      let new_state = (place ship (fst coords) (snd coords) currState) in
+      if new_state = currState
+      then state_builder_AI currState ships 
+      else state_builder_AI new_state t
     with 
-    | ShipHere -> state_builder_AI state ships
+    | ShipHere -> state_builder_AI currState ships
 
 let can_fire (point:Battleship.point) = 
   match point with 
