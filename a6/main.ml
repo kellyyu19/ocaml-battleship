@@ -93,16 +93,16 @@ let rec play_game_helper state_p1 state_p2 turn =
             ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
             \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4. 
-            \nIf you want to place randomly, type \"random\"
+            \nIf you want to place randomly, type \"random\", (you must use this before placing any ships.)
             \nPlayer 1, please place your next ship. Ships remaining: " ^ queue state_p1 ^ "\n\n>"));
        let command = parse (read_line ()) in 
        match command with 
        | Quit -> print_endline "Goodbye!"; exit 0
        | Fire coord -> raise Malformed
        | Status -> raise Malformed
-       | PlaceRandom -> 
-         let new_state = state_builder_AI state_p1 state_p1.ship_list in print_text_grid new_state state_p2 true false;
-         play_game_helper new_state state_p2 turn
+       | PlaceRandom -> if (List.length state_p1.ships_on_grid )>0 then raise Malformed else 
+           let new_state = state_builder_AI state_p1 state_p1.ship_list in print_text_grid new_state state_p2 true false;
+           play_game_helper new_state state_p2 turn
        | Place ship -> 
          let ship = cmdToShip command in 
          let coordOne = cmdToCoordOne command in 
@@ -117,16 +117,16 @@ let rec play_game_helper state_p1 state_p2 turn =
             ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
             \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4.
-            \nIf you want to place randomly, type \"random\" 
+            \nIf you want to place randomly, type \"random\", (you must use this before placing any ships.)
             \nPlayer 2, please place your next ship. Ships remaining: " ^ queue state_p2 ^ "\n\n>"));
        let command = parse (read_line ()) in 
        match command with 
        | Quit -> print_endline "Goodbye!"; exit 0
        | Fire coord -> raise Malformed
        | Status -> raise Malformed
-       | PlaceRandom -> 
-         let new_state = state_builder_AI state_p2 state_p2.ship_list in print_text_grid state_p1 new_state false true;
-         play_game_helper state_p1 new_state turn
+       | PlaceRandom ->  if (List.length state_p2.ships_on_grid )>0 then raise Malformed else 
+           let new_state = state_builder_AI state_p2 state_p2.ship_list in print_text_grid state_p1 new_state false true;
+           play_game_helper state_p1 new_state turn
        | Place ship -> 
          let ship = cmdToShip command in 
          let coordOne = cmdToCoordOne command in 
@@ -196,16 +196,16 @@ let rec solo_game_helper state_p1 state_AI =
             ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
             \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4. 
-            \nIf you want to place randomly, type \"random\" 
+            \nIf you want to place randomly, type \"random\", (you must use this before placing any ships.)
             \nPlayer 1, please place your next ship. Ships remaining: " ^ queue state_p1 ^ "\n\n>"));
        let command = parse (read_line ()) in 
        match command with 
        | Quit -> print_endline "Goodbye!"; exit 0
        | Fire coord -> raise Malformed
        | Status -> raise Malformed
-       | PlaceRandom -> 
-         let new_state = state_builder_AI state_p1 state_p1.ship_list in 
-         solo_game_helper new_state state_AI
+       | PlaceRandom ->  if (List.length state_p1.ships_on_grid )>0 then raise Malformed else 
+           let new_state = state_builder_AI state_p1 state_p1.ship_list in 
+           solo_game_helper new_state state_AI
        | Place ship -> 
          let ship = cmdToShip command in 
          let coordOne = cmdToCoordOne command in 
