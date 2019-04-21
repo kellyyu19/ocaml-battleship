@@ -93,12 +93,16 @@ let rec play_game_helper state_p1 state_p2 turn =
             ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
             \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4. 
+            \nIf you want to place randomly, type \"random\"
             \nPlayer 1, please place your next ship. Ships remaining: " ^ queue state_p1 ^ "\n\n>"));
        let command = parse (read_line ()) in 
        match command with 
        | Quit -> print_endline "Goodbye!"; exit 0
        | Fire coord -> raise Malformed
        | Status -> raise Malformed
+       | PlaceRandom -> 
+         let new_state = state_builder_AI state_p1 state_p1.ship_list in 
+         play_game_helper new_state state_p2 turn
        | Place ship -> 
          let ship = cmdToShip command in 
          let coordOne = cmdToCoordOne command in 
@@ -112,13 +116,17 @@ let rec play_game_helper state_p1 state_p2 turn =
          (print_string [blue] 
             ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
-            \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4. 
+            \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4.
+            \nIf you want to place randomly, type \"random\" 
             \nPlayer 2, please place your next ship. Ships remaining: " ^ queue state_p2 ^ "\n\n>"));
        let command = parse (read_line ()) in 
        match command with 
        | Quit -> print_endline "Goodbye!"; exit 0
        | Fire coord -> raise Malformed
        | Status -> raise Malformed
+       | PlaceRandom -> 
+         let new_state = state_builder_AI state_p2 state_p2.ship_list in 
+         play_game_helper state_p1 new_state turn
        | Place ship -> 
          let ship = cmdToShip command in 
          let coordOne = cmdToCoordOne command in 
@@ -188,12 +196,16 @@ let rec solo_game_helper state_p1 state_AI =
             ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
             \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4. 
+            \nIf you want to place randomly, type \"random\" 
             \nPlayer 1, please place your next ship. Ships remaining: " ^ queue state_p1 ^ "\n\n>"));
        let command = parse (read_line ()) in 
        match command with 
        | Quit -> print_endline "Goodbye!"; exit 0
        | Fire coord -> raise Malformed
        | Status -> raise Malformed
+       | PlaceRandom -> 
+         let new_state = state_builder_AI state_p1 state_p1.ship_list in 
+         solo_game_helper new_state state_AI
        | Place ship -> 
          let ship = cmdToShip command in 
          let coordOne = cmdToCoordOne command in 
@@ -227,7 +239,7 @@ let rec solo_game_helper state_p1 state_AI =
                 let new_state = fire (fire_AI_coords state_p1.current_grid state_p1.current_grid) state_p1 in
                 if (new_state = state_p1) 
                 then ai_fire_helper state_p1 state_AI
-                else (print_text_grid new_state state_AI true false; new_state) in 
+                else (print_text_grid new_state state_AI true true; new_state) in 
               let new_p1 = ai_fire_helper state_p1 new_state in 
               if winOrNot new_p1.sunk_list 
               then (print_endline "The AI has won."; exit 0)
@@ -267,6 +279,10 @@ let rec play_game mode =
   with 
   | Malformed -> print_endline 
                    "\n Please enter a valid gamemode.\n ~Versus\n ~Solo\n";
+    print_string ">>>";
+    play_game (parse (read_line ()))
+  | Empty -> print_endline 
+               "\n Please enter a valid gamemode.\n ~Versus\n ~Solo\n";
     print_string ">>>";
     play_game (parse (read_line ()))
 
