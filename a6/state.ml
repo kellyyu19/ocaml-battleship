@@ -204,14 +204,14 @@ let generate_rnd_col () =
   List.nth (Battleship.columns) (Random.int 10)
 
 let int_choice elt1 elt2 = 
-  if (elt1 > 10 || elt1 < 0) && not (elt2 > 10 || elt2 < 0) then elt2 
-  else if (elt2 > 10 || elt2 < 0) && not (elt1 > 10 || elt1 < 0) then elt1 
+  if (elt1 > 11 || elt1 < 1) && not (elt2 > 11 || elt2 < 1) then elt2 
+  else if (elt2 > 11 || elt2 < 1) && not (elt1 > 11 || elt1 < 1) then elt1 
   else if generate_0_1 () = 1 then elt1 
   else elt2
 
 let char_choice  elt1 elt2 = 
-  if ('a' < elt1 && elt1 < 'j') && not ('a' < elt2 && elt2 < 'j') then elt1 
-  else if ('a' < elt2 && elt2 < 'j') && not ('a' < elt1 && elt1 < 'j') then elt2 
+  if ('a' <= elt1 && elt1 <= 'j') && not ('a' <= elt2 && elt2 <= 'j') then elt1 
+  else if ('a' <= elt2 && elt2 <= 'j') && not ('a' <= elt1 && elt1 <= 'j') then elt2 
   else if generate_0_1 () = 1 then elt1 
   else elt2
 
@@ -252,17 +252,18 @@ let can_fire (point:Battleship.point) =
 
 let rec get_point (coord:Battleship.coordinate) (grid: Battleship.grid) (fullgrid:Battleship.grid)= 
   match grid with 
-  |[] -> List.nth fullgrid (Random.int 101)
+  |[] -> failwith"coord does not exist in grid"
   |h::t -> if fst(h) = coord then h else get_point coord t fullgrid
 
 let pick_adjacent grid (point:Battleship.point) (rowcode: int) s : Battleship.coordinate = 
-  if generate_0_3 () = 0 && 
+  if 'a' <= (Char.chr (rowcode - 1)) && (Char.chr (rowcode - 1)) <= 'j' && 1 <= (snd (fst point)) && (snd (fst point))<= 10 &&
      can_fire (get_point (Char.chr (rowcode - 1) , snd (fst point)) grid grid) then (Char.chr (rowcode - 1) , snd (fst point))
-  else if generate_0_3 () = 1 && 
+  else if 'a' <= (Char.chr (rowcode + 1)) && (Char.chr (rowcode + 1)) <= 'j' && 1 <= (snd (fst point)) && (snd (fst point))<= 10   && 
           can_fire (get_point (Char.chr (rowcode + 1) , snd (fst point)) grid grid) then (Char.chr (rowcode + 1) , snd (fst point)) 
-  else if generate_0_3 () = 2 && 
+  else if 'a' <= (fst(fst point)) && (fst(fst point)) <= 'j' && 1 <= (snd (fst point)-1) && (snd (fst point)-1)<= 10  && 
           can_fire (get_point ((fst(fst point) , snd(fst point)-1)) grid grid) then (fst(fst point) , snd(fst point)-1)
-  else if can_fire (get_point ((fst(fst point) , snd(fst point)+1)) grid grid) then (fst(fst point) , snd(fst point)+1)
+  else if 'a' <= (fst(fst point)) && (fst(fst point)) <= 'j' && 1 <= (snd (fst point)+1) && (snd (fst point)+1)<= 10  && 
+          can_fire (get_point ((fst(fst point) , snd(fst point)+1)) grid grid) then (fst(fst point) , snd(fst point)+1)
   else (generate_rnd_row (), generate_rnd_col ())
 
 
