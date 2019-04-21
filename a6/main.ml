@@ -101,7 +101,7 @@ let rec play_game_helper state_p1 state_p2 turn =
        | Fire coord -> raise Malformed
        | Status -> raise Malformed
        | PlaceRandom -> 
-         let new_state = state_builder_AI state_p1 state_p1.ship_list in 
+         let new_state = state_builder_AI state_p1 state_p1.ship_list in print_text_grid new_state state_p2 true false;
          play_game_helper new_state state_p2 turn
        | Place ship -> 
          let ship = cmdToShip command in 
@@ -125,7 +125,7 @@ let rec play_game_helper state_p1 state_p2 turn =
        | Fire coord -> raise Malformed
        | Status -> raise Malformed
        | PlaceRandom -> 
-         let new_state = state_builder_AI state_p2 state_p2.ship_list in 
+         let new_state = state_builder_AI state_p2 state_p2.ship_list in print_text_grid state_p1 new_state false true;
          play_game_helper state_p1 new_state turn
        | Place ship -> 
          let ship = cmdToShip command in 
