@@ -223,12 +223,19 @@ let make_AI_coords decider (row: char) col rowcode (ship:Battleship.ship) =
     ( (row,col), (char_choice (Char.chr (rowcode - ship.size + 1 )) (Char.chr (rowcode + ship.size - 1)),col)  )
 
 
+let sort_tuple tup = 
+  match tup with 
+  |((r1, c1), (r2, c2)) -> if c2 > c1 || r2 > r1 then ((r1, c1), (r2, c2)) 
+    else ((r2, c2), (r1, c1))
+
+
 let output_AI_coords ship = 
   let rnd_0_1 = generate_0_1 () in
   let c = generate_rnd_col () in
   let r = generate_rnd_row () in 
   let r_code = Char.code r in 
-  make_AI_coords rnd_0_1 r c r_code ship
+  let unsorted_tuple = make_AI_coords rnd_0_1 r c r_code ship in 
+  sort_tuple unsorted_tuple
 
 let rec state_builder_AI (currState:state) (ships:ship list) =
   match ships with
