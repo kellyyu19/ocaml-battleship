@@ -244,8 +244,8 @@ let rec state_builder_AI (currState:state) (ships:ship list) =
     try 
       let coords = (output_AI_coords ship) in 
       let new_state = (place ship (fst coords) (snd coords) currState) in
-      if new_state = currState
-      then state_builder_AI currState ships 
+      if List.length new_state.ships_on_grid = List.length currState.ships_on_grid
+      then state_builder_AI currState ships
       else state_builder_AI new_state t
     with 
     | ShipHere -> state_builder_AI currState ships
