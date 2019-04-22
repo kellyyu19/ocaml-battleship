@@ -93,11 +93,11 @@ let rec sink_ship ship (currentGrid:Battleship.grid) outlist =
 let rec hit_ship ship (currentGrid:Battleship.grid) r' c' outlist : Battleship.grid = 
   match currentGrid with 
   |[] -> outlist 
-  |((r,c),Occupied({name=nm;size=sz;hits=hts}))::t when (ship.name = nm && (r'<>r || c'<>c)) -> print_endline "occupied branch 96";
+  |((r,c),Occupied({name=nm;size=sz;hits=hts}))::t when (ship.name = nm && (r'<>r || c'<>c)) ->
     hit_ship ship t r' c' (((r,c),Occupied({ship with hits=hts+1}))::outlist)
-  |((r,c),Occupied({name=nm;size=sz;hits=hts}))::t when (ship.name = nm && r'=r && c'=c) -> print_endline "occupied branch 98";
+  |((r,c),Occupied({name=nm;size=sz;hits=hts}))::t when (ship.name = nm && r'=r && c'=c) ->
     hit_ship ship t r' c' (((r,c),Hit({ship with hits=hts+1}))::outlist)
-  |((r,c),Hit({name=nm;size=sz;hits=hts}))::t when ship.name = nm -> print_endline "hit branch 100";
+  |((r,c),Hit({name=nm;size=sz;hits=hts}))::t when ship.name = nm -> 
     hit_ship ship t r' c' (((r,c),Hit({ship with hits=ship.hits+1}))::outlist)
   |((r,c),s)::t -> hit_ship ship t r' c' (((r,c),s)::outlist)
 
