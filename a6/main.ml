@@ -283,7 +283,7 @@ let rec solo_game_helper state_p1 state_AI =
 
 let rec play_game mode = 
   try
-    match mode with
+    match parse mode with
     | Versus -> play_game_helper init_state init_state true
     | Solo -> let fresh_state = init_state in 
       let ai_state = state_builder_AI fresh_state fresh_state.ship_list in 
@@ -294,18 +294,18 @@ let rec play_game mode =
   | Malformed -> print_endline 
                    "\n Please enter a valid gamemode.\n ~Versus\n ~Solo\n";
     print_string ">>>";
-    play_game (parse (read_line ()))
+    play_game ((read_line ()))
   | Empty -> print_endline 
                "\n Please enter a valid gamemode.\n ~Versus\n ~Solo\n";
     print_string ">>>";
-    play_game (parse (read_line ()))
+    play_game ((read_line ()))
 
 
 let main () = 
   ANSITerminal.print_string [ANSITerminal.Foreground Blue] "\n Battleship\n";
   print_endline "\n Choose a game mode \n\n ~Versus\n ~Solo ";
   print_string ">>>";
-  let mode = parse (read_line ()) in play_game mode 
+  let mode = (read_line ()) in play_game mode 
 
 (** Executes the game engine. *)
 let () = main ()
