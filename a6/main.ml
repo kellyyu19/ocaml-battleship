@@ -100,7 +100,8 @@ let rec play_game_helper state_p1 state_p2 turn =
        | Quit -> print_endline "Goodbye!"; exit 0
        | Fire coord -> raise Malformed
        | Status -> raise Malformed
-       | PlaceRandom -> if (List.length state_p1.ships_on_grid )>0 then raise Malformed else 
+       | PlaceRandom -> Random.init (int_of_float ((Unix.time ())) mod 10000);
+         if (List.length state_p1.ships_on_grid )>0 then raise Malformed else 
            let new_state = state_builder_AI state_p1 state_p1.ship_list in 
            print_text_grid new_state state_p2 true false; 
            print_endline "\n\n\n\n\n\n\n\n\n\n";
@@ -130,11 +131,12 @@ let rec play_game_helper state_p1 state_p2 turn =
        | Quit -> print_endline "Goodbye!"; exit 0
        | Fire coord -> raise Malformed
        | Status -> raise Malformed
-       | PlaceRandom ->  if (List.length state_p2.ships_on_grid )>0 then raise Malformed else 
+       | PlaceRandom -> Random.init (int_of_float ((Unix.time ())) mod 10000);
+         if (List.length state_p2.ships_on_grid )>0 then raise Malformed else 
            let new_state = state_builder_AI state_p2 state_p2.ship_list in 
            print_text_grid state_p1 new_state false true;
            print_endline "\n\n\n\n\n\n\n\n\n\n";
-           print_text_grid new_state state_p2 false false; 
+           print_text_grid state_p1 new_state false false; 
            play_game_helper state_p1 new_state turn
        | Place ship -> 
          let ship = cmdToShip command in 
@@ -143,7 +145,7 @@ let rec play_game_helper state_p1 state_p2 turn =
          let safeCoords = sort_tuple (coordOne,coordTwo) in
          let new_state = (place ship (fst safeCoords) (snd safeCoords) state_p2) in
          print_text_grid state_p1 new_state false true;
-         print_text_grid state_p1 state_p2 false true;
+         print_text_grid state_p1 new_state false false;
          play_game_helper state_p1 new_state turn
        | _ -> raise Malformed)
 
@@ -215,7 +217,8 @@ let rec solo_game_helper state_p1 state_AI =
        | Quit -> print_endline "Goodbye!"; exit 0
        | Fire coord -> raise Malformed
        | Status -> raise Malformed
-       | PlaceRandom ->  if (List.length state_p1.ships_on_grid )>0 then raise Malformed else 
+       | PlaceRandom ->  Random.init (int_of_float ((Unix.time ())) mod 10000);
+         if (List.length state_p1.ships_on_grid )>0 then raise Malformed else 
            let new_state = state_builder_AI state_p1 state_p1.ship_list in 
            print_text_grid new_state state_AI true false;
            solo_game_helper new_state state_AI

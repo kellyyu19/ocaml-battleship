@@ -255,7 +255,7 @@ let rec state_builder_AI (currState:state) (ships:ship list) =
       then state_builder_AI currState ships
       else state_builder_AI new_state t
     with 
-    | ShipHere -> state_builder_AI currState ships
+    | _ -> state_builder_AI currState ships
 
 let can_fire (point:Battleship.point) = 
   match point with 
