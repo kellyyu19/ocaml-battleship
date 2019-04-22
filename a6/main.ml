@@ -70,12 +70,14 @@ let cmdToCoordTwo command =
 (** [print_text_grid state_p1 state_p2] prints the grid for both the
     states of player 1 and player 2.*)
 let print_text_grid state_p1 state_p2 ship_vis1 ship_vis2= 
-  print_endline ("Player 1's Ships':" ^"\n"^
-                 (Textgrid.text_grid 
-                    (Textgrid.sort_and_group_rows 
-                       (List.rev Battleship.rows) (state_p1.current_grid) []) "" ship_vis1)); 
-  print_endline ("Player 2's Ships':" ^"\n"^
-                 (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p2.current_grid) []) "" ship_vis2)); ()
+  (ANSITerminal.
+     (print_string [on_blue] ("\nPlayer 1's Ships':" ^"\n"^
+                              (Textgrid.text_grid 
+                                 (Textgrid.sort_and_group_rows 
+                                    (List.rev Battleship.rows) (state_p1.current_grid) []) "" ship_vis1)^"\n\n"))); 
+  (ANSITerminal.                               
+     (print_string [on_red] ("\nPlayer 2's Ships':" ^"\n"^
+                             (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p2.current_grid) []) "" ship_vis2)^"\n\n"))); ()
 
 (** [play_game_helper state_p1 state_p2 turn] is the helper function for
     playing the actual game. It takes care of placing the ships, changing 
@@ -89,7 +91,7 @@ let rec play_game_helper state_p1 state_p2 turn =
   try 
     if (placing state_p1) then 
       (ANSITerminal.
-         (print_string [blue] 
+         (print_string [white] 
             ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
             \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4. 
@@ -122,7 +124,7 @@ let rec play_game_helper state_p1 state_p2 turn =
 
     else if (placing state_p2) then
       (ANSITerminal.
-         (print_string [blue] 
+         (print_string [white] 
             ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
             \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4.
@@ -154,7 +156,7 @@ let rec play_game_helper state_p1 state_p2 turn =
 
     else 
       (ANSITerminal.
-         (print_string [blue] 
+         (print_string [white] 
             ("\n The game has now started. \nTo fire, type \"fire [coordinate]\""^
              " \nTo see how many ships you have sunk, type \"status\"" 
              ^ if turn then "\n Player 1, make a move.\n >"
@@ -209,7 +211,7 @@ let rec solo_game_helper state_p1 state_AI =
   try
     if (placing state_p1) then 
       (ANSITerminal.
-         (print_string [blue] 
+         (print_string [white] 
             ("If you want to place all the ships randomly, type \"random\" , (you must use this before placing any ships.)
             \nTo place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
@@ -236,7 +238,7 @@ let rec solo_game_helper state_p1 state_AI =
        | _ -> raise Malformed)
     else 
       (ANSITerminal.
-         (print_string [blue] 
+         (print_string [white] 
             ("\n The game has now started. \nTo fire, type \"fire [coordinate]"^
              "\" \nTo see how many ships you have sunk, type \"status\"" 
              ^ "\n Player 1, make a move.\n >")); 
