@@ -115,6 +115,8 @@ let rec play_game_helper state_p1 state_p2 turn =
          let safeCoords = sort_tuple (coordOne,coordTwo) in
          let new_state = (place ship (fst safeCoords) (snd safeCoords) state_p1) in
          print_text_grid new_state state_p2 true false;
+         print_endline "\n\n\n\n\n\n\n\n\n\n";
+         print_text_grid new_state state_p2 false false;
          play_game_helper new_state state_p2 turn
        | _ -> raise Malformed)
 
@@ -145,6 +147,7 @@ let rec play_game_helper state_p1 state_p2 turn =
          let safeCoords = sort_tuple (coordOne,coordTwo) in
          let new_state = (place ship (fst safeCoords) (snd safeCoords) state_p2) in
          print_text_grid state_p1 new_state false true;
+         print_endline "\n\n\n\n\n\n\n\n\n\n";
          print_text_grid state_p1 new_state false false;
          play_game_helper state_p1 new_state turn
        | _ -> raise Malformed)
