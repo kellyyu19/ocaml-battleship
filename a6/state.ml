@@ -2,7 +2,7 @@ open Battleship
 
 (**  An instance of a battleship game. *)
 type state = {ship_list: ship list; current_grid: grid; sunk_list: ship list; 
-              ships_on_grid: ship list}
+              ships_on_grid: ship list; bombs_left: int}
 
 (**  [init_battleship] is a new battleship *)
 let init_battleship = {name = Battleship; size = 4; hits = 0}
@@ -30,7 +30,7 @@ let init_state : state = {ship_list = init_ships;
                           current_grid = Battleship.init_grid Battleship.rows 
                               Battleship.columns [];
                           sunk_list = [];
-                          ships_on_grid = []}
+                          ships_on_grid = []; bombs_left = 3}
 
 (** OutOfBounds is raised when the given coordinates are outside of the grid or do not 
     correspond to ship size. *)
@@ -60,7 +60,7 @@ let place (ship:ship) (coordOne:coordinate) (coordTwo:coordinate) (state:state) 
         (fst coordTwo) [] in 
     {ship_list=init_ships; current_grid = Battleship.make_grid ship coords 
                                state.current_grid [];
-     sunk_list=[]; ships_on_grid=ship::state.ships_on_grid}
+     sunk_list=[]; ships_on_grid=ship::state.ships_on_grid; bombs_left=3}
   else if (fst coordOne = fst coordTwo && Pervasives.abs 
              (snd coordOne - snd coordTwo) = ship.size - 1)
   then
@@ -68,7 +68,7 @@ let place (ship:ship) (coordOne:coordinate) (coordTwo:coordinate) (state:state) 
         (snd coordTwo) [] in 
     {ship_list=init_ships; current_grid = Battleship.make_grid ship coords 
                                state.current_grid [];
-     sunk_list=[]; ships_on_grid=ship::state.ships_on_grid}
+     sunk_list=[]; ships_on_grid=ship::state.ships_on_grid; bombs_left=3}
   else raise OutOfBounds
 
 (** [new_ship_list ship ship_list outlist] is the list of ships resulting from 
@@ -134,26 +134,31 @@ let fire (coord: coordinate) (currentState: state) =
     match currGrid with 
     | [] ->  {ship_list = currShipList; current_grid = currGrid; 
               sunk_list = curr_sunk_list currShipList [];
-              ships_on_grid = currentState.ships_on_grid}
+              ships_on_grid = currentState.ships_on_grid; 
+              bombs_left=currentState.bombs_left}
     | ((r,c),Empty)::t when (r,c) = coord -> 
       let update_grid_var = update_grid_empty coord currGrid [] in 
       {ship_list=currShipList; current_grid=update_grid_var;
        sunk_list = currentState.sunk_list;
-       ships_on_grid = currentState.ships_on_grid}
+       ships_on_grid = currentState.ships_on_grid; 
+       bombs_left=currentState.bombs_left}
     | ((r,c),Hit(s))::t when (r,c)=coord -> 
       {ship_list = currShipList; current_grid = currGrid; 
        sunk_list = curr_sunk_list currShipList [];
-       ships_on_grid = currentState.ships_on_grid}
+       ships_on_grid = currentState.ships_on_grid;
+       bombs_left=currentState.bombs_left}
     | ((r,c),Miss)::t when (r,c)=coord -> 
       {ship_list = currShipList; current_grid = currGrid; 
        sunk_list = curr_sunk_list currShipList [];
-       ships_on_grid = currentState.ships_on_grid}
+       ships_on_grid = currentState.ships_on_grid;
+       bombs_left=currentState.bombs_left}
     | ((r,c),Occupied(s))::t when (r,c)=coord -> 
       let update_ship_list = new_ship_list s currShipList [] in 
       let update_grid_var = update_grid_occupied s coord currentState currGrid [] in 
       {ship_list=update_ship_list; current_grid=update_grid_var;
        sunk_list = curr_sunk_list update_ship_list [];
-       ships_on_grid = currentState.ships_on_grid}
+       ships_on_grid = currentState.ships_on_grid; 
+       bombs_left=currentState.bombs_left}
     | ((r,c),point)::t -> let new_state = fireHelper coord t currShipList in 
       if List.length new_state.current_grid < 100 then
         let new_grid = ((r,c),point)::new_state.current_grid in 
@@ -287,6 +292,46 @@ let rec fire_AI_coords (fullgrid: Battleship.grid) (grid:Battleship.grid) : coor
   |((r,c), Hit(s))::t -> pick_adjacent fullgrid ((r,c), Hit(s)) (Char.code r) s
   |h::t -> fire_AI_coords fullgrid t 
 
-(** [winOrNot] is whether or not all ships have sunk in this game. *)
+(** [can_bomb state] is whether or not the user can use a bomb *)
+let can_bomb state = 
+  if state.bombs_left <= 0 then false else true
+
+let get_bomb_coords coord : coordinate list = 
+  let row = match coord with 
+    | (r,c) -> r in 
+  let col = match coord with
+    | (r,c) -> c in 
+  let rowASCII = Char.code row in 
+  if row < 'j' && row > 'a' && col > 1 && col < 10 
+  then [(Char.chr (rowASCII-1), col); (Char.chr (rowASCII+1), col); 
+        coord; (row, col-1); (row, col+1)]
+  else if row = 'a' && col <> 1 && col <> 10 
+  then [(Char.chr (rowASCII+1), col); coord; (row, col-1); (row, col+1)]
+  else if row = 'j' && col <> 1 && col <> 10 
+  then [(Char.chr (rowASCII-1), col); coord; (row, col-1); (row, col+1)]
+  else if col = 1 && row <> 'a' && row <> 'j'
+  then [(Char.chr (rowASCII+1), col); coord; (Char.chr (rowASCII-1), col); 
+        (row, col+1)]
+  else if col = 10 && row <> 'a' && row <> 'j'
+  then [(Char.chr (rowASCII+1), col); coord; (Char.chr (rowASCII-1), col); 
+        (row, col-1)]
+  else if row = 'a' && col = 1
+  then [coord; (Char.chr (rowASCII+1), col); (row, col+1)]
+  else if row = 'a' && col = 10 
+  then [coord; (Char.chr (rowASCII+1), col); (row, col-1)]
+  else if row = 'j' && col = 1
+  then [coord; (Char.chr (rowASCII-1), col); (row, col+1)]
+  else [coord; (Char.chr (rowASCII-1), col); (row, col-1)]
+
+let rec bomb_helper coordsList currentState =  
+  match coordsList with 
+  | [] -> {currentState with bombs_left=currentState.bombs_left-1}
+  | h::t -> bomb_helper t (fire h currentState)
+
+let bomb coord currentState= 
+  let coordsList = get_bomb_coords coord in 
+  bomb_helper coordsList currentState
+
+(** [winOrNot lst] is whether or not all ships have sunk in this game. *)
 let winOrNot lst : bool = 
   if List.length lst = 5 then true else false

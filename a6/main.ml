@@ -14,6 +14,12 @@ let cmdToTupleFire command =
     else if String.sub coord 1 2 = "10" then
       (String.get coord 0, 10)
     else raise Malformed
+  | Bomb list when (List.length list = 1) -> let coord = List.nth list 0 in 
+    if String.length coord = 2 then 
+      (String.get coord 0, int_of_char (String.get coord 1) - 48)
+    else if String.sub coord 1 2 = "10" then
+      (String.get coord 0, 10)
+    else raise Malformed
   | _ -> raise Malformed
 
 (** [string_to_ship str] converts the string that represents a ship to 
@@ -156,7 +162,7 @@ let rec play_game_helper state_p1 state_p2 turn =
       (ANSITerminal.
          (print_string [blue] 
             ("\n The game has now started. \nTo fire, type \"fire [coordinate]\""^
-             " \nTo see how many ships you have sunk, type \"status\"" 
+             "\nTo use a bomb, type \"bomb [coordinate]\" \nTo see how many ships you have sunk, type \"status\"" 
              ^ if turn then "\n Player 1, make a move.\n >"
              else "\n Player 2, make a move.\n >"))); 
 
@@ -193,6 +199,33 @@ let rec play_game_helper state_p1 state_p2 turn =
     | Quit -> print_endline "Goodbye!"; exit 0
     | Place ship-> print_endline "\n All ships have already been placed";
       play_game_helper state_p1 state_p2 turn  
+    | Bomb coord -> 
+      if can_bomb (if turn then state_p2 else state_p1)then 
+        let new_state = bomb (cmdToTupleFire userInput) 
+            (if turn then state_p2 else state_p1) in 
+        (if turn && new_state = state_p2 
+         then (print_text_grid state_p1 state_p2 false false; 
+               print_endline "\n Nothing has happened. Try again.";
+               play_game_helper state_p1 state_p2 turn)
+         else if turn 
+         then (print_text_grid state_p1 new_state false false; 
+               print_endline "Shot fired."; 
+               if winOrNot new_state.sunk_list 
+               then (print_endline "Player 1 has won."; exit 0)
+               else play_game_helper state_p1 new_state (not turn))
+         else if new_state = state_p1 
+         then (print_text_grid state_p1 state_p2 false false; 
+               print_endline "\n Nothing has happened. Try again.";
+               play_game_helper state_p1 state_p2 turn)
+         else print_text_grid new_state state_p2 false false; 
+         print_endline "Shot fired.";
+         if winOrNot new_state.sunk_list 
+         then (print_endline "Player 2 has won."; exit 0)
+         else play_game_helper new_state state_p2 (not turn))
+      else (print_endline "You have no more bombs. Enter another command."); 
+      if turn then 
+        play_game_helper state_p1 state_p2 turn 
+      else play_game_helper state_p2 state_p1 (not turn) 
     | _ -> raise Malformed
 
   with 
@@ -238,7 +271,7 @@ let rec solo_game_helper state_p1 state_AI =
       (ANSITerminal.
          (print_string [blue] 
             ("\n The game has now started. \nTo fire, type \"fire [coordinate]"^
-             "\" \nTo see how many ships you have sunk, type \"status\"" 
+             "\" \nTo use a bomb, type \"bomb [coordinate]\" \nTo see how many ships you have sunk, type \"status\"" 
              ^ "\n Player 1, make a move.\n >")); 
 
        let userInput  = parse (read_line ()) in
@@ -264,6 +297,30 @@ let rec solo_game_helper state_p1 state_AI =
               if winOrNot new_p1.sunk_list 
               then (print_endline "The AI has won."; exit 0)
               else solo_game_helper new_p1 new_state)
+       | Bomb coord -> 
+         if can_bomb state_AI then 
+           let new_state = bomb (cmdToTupleFire userInput) state_AI in 
+           if (new_state = state_AI)
+           then (print_text_grid state_p1 state_AI true false; 
+                 print_endline "\n Nothing has happened. Try again.";
+                 solo_game_helper state_p1 state_AI)
+           else 
+             (print_text_grid state_p1 new_state true false; 
+              print_endline "Bomb fired."; 
+              if winOrNot new_state.sunk_list 
+              then (print_endline "Player 1 has won."; exit 0)
+              else 
+                let rec ai_fire_helper state_p1 state_AI = 
+                  let new_state = fire (fire_AI_coords state_p1.current_grid state_p1.current_grid) state_p1 in
+                  if (new_state = state_p1) 
+                  then ai_fire_helper state_p1 state_AI
+                  else (print_text_grid new_state state_AI true false; new_state) in 
+                let new_p1 = ai_fire_helper state_p1 new_state in 
+                if winOrNot new_p1.sunk_list 
+                then (print_endline "The AI has won."; exit 0)
+                else solo_game_helper new_p1 new_state)
+         else (print_endline "You have no more bombs. Enter another command."); 
+         solo_game_helper state_p1 state_AI
        | Status -> 
          print_endline 
            ("You have sunk: " ^ 
