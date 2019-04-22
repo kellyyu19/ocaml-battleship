@@ -93,24 +93,19 @@ let rec sink_ship ship (currentGrid:Battleship.grid) outlist =
 let rec hit_ship ship (currentGrid:Battleship.grid) r' c' outlist : Battleship.grid = 
   match currentGrid with 
   |[] -> outlist 
-  |((r,c),Occupied({name=nm;size=sz;hits=hts}))::t when (ship.name = nm && (r'<>r || c'<>c)) -> 
+  |((r,c),Occupied({name=nm;size=sz;hits=hts}))::t when (ship.name = nm && (r'<>r || c'<>c)) -> print_endline "occupied branch 96";
     hit_ship ship t r' c' (((r,c),Occupied({ship with hits=hts+1}))::outlist)
-  |((r,c),Occupied({name=nm;size=sz;hits=hts}))::t when (ship.name = nm && r'=r &&c'=c) -> 
+  |((r,c),Occupied({name=nm;size=sz;hits=hts}))::t when (ship.name = nm && r'=r && c'=c) -> print_endline "occupied branch 98";
     hit_ship ship t r' c' (((r,c),Hit({ship with hits=hts+1}))::outlist)
-  |((r,c),Hit({name=nm;size=sz;hits=hts}))::t when ship.name = nm -> 
+  |((r,c),Hit({name=nm;size=sz;hits=hts}))::t when ship.name = nm -> print_endline "hit branch 100";
     hit_ship ship t r' c' (((r,c),Hit({ship with hits=ship.hits+1}))::outlist)
   |((r,c),s)::t -> hit_ship ship t r' c' (((r,c),s)::outlist)
 
-let rec update_grid_occupied ship coord state (currentGrid:Battleship.grid) outlist = 
-  match currentGrid with 
-  | [] -> outlist
-  | ((r,c),s)::t  -> if (r,c) = coord 
-    then 
-      if ship.hits+1 = ship.size then 
-        (sink_ship ship (hit_ship ship currentGrid r c []) [])
-      else 
-        hit_ship ship currentGrid r c []
-    else update_grid_occupied ship coord state t (((r,c),s)::outlist)
+let update_grid_occupied ship coord state (currentGrid:Battleship.grid) outlist = 
+  let new_grid = (hit_ship ship state.current_grid (fst coord) (snd coord) []) in
+  if ship.hits+1 = ship.size then
+    sink_ship ship new_grid []
+  else new_grid
 
 (** [upgrade_grid_empty coord currentGrid outlist] is [currentGrid]
     with the point at the given coordinate changed from Empty status to Miss status. *)
@@ -160,8 +155,10 @@ let fire (coord: coordinate) (currentState: state) =
        sunk_list = curr_sunk_list update_ship_list [];
        ships_on_grid = currentState.ships_on_grid}
     | ((r,c),point)::t -> let new_state = fireHelper coord t currShipList in 
-      let new_grid = ((r,c),point)::new_state.current_grid in 
-      { new_state with current_grid = new_grid}
+      if List.length new_state.current_grid < 100 then
+        let new_grid = ((r,c),point)::new_state.current_grid in 
+        { new_state with current_grid = new_grid}
+      else new_state
   in fireHelper coord currentState.current_grid currentState.ship_list 
 
 (** [placing] is whether or not the current game is still in placing mode. 
