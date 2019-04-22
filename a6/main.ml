@@ -14,6 +14,12 @@ let cmdToTupleFire command =
     else if String.sub coord 1 2 = "10" then
       (String.get coord 0, 10)
     else raise Malformed
+  | Bomb list when (List.length list = 1) -> let coord = List.nth list 0 in 
+    if String.length coord = 2 then 
+      (String.get coord 0, int_of_char (String.get coord 1) - 48)
+    else if String.sub coord 1 2 = "10" then
+      (String.get coord 0, 10)
+    else raise Malformed
   | _ -> raise Malformed
 
 (** [string_to_ship str] converts the string that represents a ship to 
@@ -70,12 +76,14 @@ let cmdToCoordTwo command =
 (** [print_text_grid state_p1 state_p2] prints the grid for both the
     states of player 1 and player 2.*)
 let print_text_grid state_p1 state_p2 ship_vis1 ship_vis2= 
-  print_endline ("Player 1's Ships':" ^"\n"^
-                 (Textgrid.text_grid 
-                    (Textgrid.sort_and_group_rows 
-                       (List.rev Battleship.rows) (state_p1.current_grid) []) "" ship_vis1)); 
-  print_endline ("Player 2's Ships':" ^"\n"^
-                 (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p2.current_grid) []) "" ship_vis2)); ()
+  (ANSITerminal.
+     (print_string [on_blue] ("\nPlayer 1's Ships':" ^"\n"^
+                              (Textgrid.text_grid 
+                                 (Textgrid.sort_and_group_rows 
+                                    (List.rev Battleship.rows) (state_p1.current_grid) []) "" ship_vis1)^"\n\n"))); 
+  (ANSITerminal.                               
+     (print_string [on_red] ("\nPlayer 2's Ships':" ^"\n"^
+                             (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p2.current_grid) []) "" ship_vis2)^"\n\n"))); ()
 
 (** [play_game_helper state_p1 state_p2 turn] is the helper function for
     playing the actual game. It takes care of placing the ships, changing 
@@ -89,7 +97,7 @@ let rec play_game_helper state_p1 state_p2 turn =
   try 
     if (placing state_p1) then 
       (ANSITerminal.
-         (print_string [blue] 
+         (print_string [white] 
             ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
             \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4. 
@@ -122,7 +130,7 @@ let rec play_game_helper state_p1 state_p2 turn =
 
     else if (placing state_p2) then
       (ANSITerminal.
-         (print_string [blue] 
+         (print_string [white] 
             ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
             \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4.
@@ -154,9 +162,9 @@ let rec play_game_helper state_p1 state_p2 turn =
 
     else 
       (ANSITerminal.
-         (print_string [blue] 
+         (print_string [white] 
             ("\n The game has now started. \nTo fire, type \"fire [coordinate]\""^
-             " \nTo see how many ships you have sunk, type \"status\"" 
+             "\nTo use a bomb, type \"bomb [coordinate]\" \nTo see how many ships you have sunk, type \"status\"" 
              ^ if turn then "\n Player 1, make a move.\n >"
              else "\n Player 2, make a move.\n >"))); 
 
@@ -193,6 +201,33 @@ let rec play_game_helper state_p1 state_p2 turn =
     | Quit -> print_endline "Goodbye!"; exit 0
     | Place ship-> print_endline "\n All ships have already been placed";
       play_game_helper state_p1 state_p2 turn  
+    | Bomb coord -> 
+      if can_bomb (if turn then state_p2 else state_p1)then 
+        let new_state = bomb (cmdToTupleFire userInput) 
+            (if turn then state_p2 else state_p1) in 
+        (if turn && {new_state with bombs_left=state_p2.bombs_left} = state_p2 
+         then (print_text_grid state_p1 state_p2 false false; 
+               print_endline "\n Nothing has happened. Try again.";
+               play_game_helper state_p1 state_p2 turn)
+         else if turn 
+         then (print_text_grid state_p1 new_state false false; 
+               print_endline "Shot fired."; 
+               if winOrNot new_state.sunk_list 
+               then (print_endline "Player 1 has won."; exit 0)
+               else play_game_helper state_p1 new_state (not turn))
+         else if {new_state with bombs_left=state_p1.bombs_left} = state_p1 
+         then (print_text_grid state_p1 state_p2 false false; 
+               print_endline "\n Nothing has happened. Try again.";
+               play_game_helper state_p1 state_p2 turn)
+         else print_text_grid new_state state_p2 false false; 
+         print_endline "Shot fired.";
+         if winOrNot new_state.sunk_list 
+         then (print_endline "Player 2 has won."; exit 0)
+         else play_game_helper new_state state_p2 (not turn))
+      else (print_endline "You have no more bombs. Enter another command."); 
+      if turn then 
+        play_game_helper state_p1 state_p2 turn 
+      else play_game_helper state_p2 state_p1 (not turn) 
     | _ -> raise Malformed
 
   with 
@@ -209,7 +244,7 @@ let rec solo_game_helper state_p1 state_AI =
   try
     if (placing state_p1) then 
       (ANSITerminal.
-         (print_string [blue] 
+         (print_string [white] 
             ("If you want to place all the ships randomly, type \"random\" , (you must use this before placing any ships.)
             \nTo place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
@@ -236,9 +271,9 @@ let rec solo_game_helper state_p1 state_AI =
        | _ -> raise Malformed)
     else 
       (ANSITerminal.
-         (print_string [blue] 
+         (print_string [white] 
             ("\n The game has now started. \nTo fire, type \"fire [coordinate]"^
-             "\" \nTo see how many ships you have sunk, type \"status\"" 
+             "\" \nTo use a bomb, type \"bomb [coordinate]\" \nTo see how many ships you have sunk, type \"status\"" 
              ^ "\n Player 1, make a move.\n >")); 
 
        let userInput  = parse (read_line ()) in
@@ -264,6 +299,30 @@ let rec solo_game_helper state_p1 state_AI =
               if winOrNot new_p1.sunk_list 
               then (print_endline "The AI has won."; exit 0)
               else solo_game_helper new_p1 new_state)
+       | Bomb coord -> 
+         if can_bomb state_AI then 
+           let new_state = bomb (cmdToTupleFire userInput) state_AI in 
+           if ({new_state with bombs_left=state_AI.bombs_left} = state_AI)
+           then (print_text_grid state_p1 state_AI true false; 
+                 print_endline "\n Nothing has happened. Try again.";
+                 solo_game_helper state_p1 state_AI)
+           else 
+             (print_text_grid state_p1 new_state true false; 
+              print_endline "Bomb fired."; 
+              if winOrNot new_state.sunk_list 
+              then (print_endline "Player 1 has won."; exit 0)
+              else 
+                let rec ai_fire_helper state_p1 state_AI = 
+                  let new_state = fire (fire_AI_coords state_p1.current_grid state_p1.current_grid) state_p1 in
+                  if (new_state = state_p1) 
+                  then ai_fire_helper state_p1 state_AI
+                  else (print_text_grid new_state state_AI true false; new_state) in 
+                let new_p1 = ai_fire_helper state_p1 new_state in 
+                if winOrNot new_p1.sunk_list 
+                then (print_endline "The AI has won."; exit 0)
+                else solo_game_helper new_p1 new_state)
+         else (print_endline "You have no more bombs. Enter another command."); 
+         solo_game_helper state_p1 state_AI
        | Status -> 
          print_endline 
            ("You have sunk: " ^ 
