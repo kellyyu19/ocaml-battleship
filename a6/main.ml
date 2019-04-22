@@ -205,7 +205,7 @@ let rec play_game_helper state_p1 state_p2 turn =
       if can_bomb (if turn then state_p2 else state_p1)then 
         let new_state = bomb (cmdToTupleFire userInput) 
             (if turn then state_p2 else state_p1) in 
-        (if turn && new_state = state_p2 
+        (if turn && {new_state with bombs_left=state_p2.bombs_left} = state_p2 
          then (print_text_grid state_p1 state_p2 false false; 
                print_endline "\n Nothing has happened. Try again.";
                play_game_helper state_p1 state_p2 turn)
@@ -215,7 +215,7 @@ let rec play_game_helper state_p1 state_p2 turn =
                if winOrNot new_state.sunk_list 
                then (print_endline "Player 1 has won."; exit 0)
                else play_game_helper state_p1 new_state (not turn))
-         else if new_state = state_p1 
+         else if {new_state with bombs_left=state_p1.bombs_left} = state_p1 
          then (print_text_grid state_p1 state_p2 false false; 
                print_endline "\n Nothing has happened. Try again.";
                play_game_helper state_p1 state_p2 turn)
@@ -302,7 +302,7 @@ let rec solo_game_helper state_p1 state_AI =
        | Bomb coord -> 
          if can_bomb state_AI then 
            let new_state = bomb (cmdToTupleFire userInput) state_AI in 
-           if (new_state = state_AI)
+           if ({new_state with bombs_left=state_AI.bombs_left} = state_AI)
            then (print_text_grid state_p1 state_AI true false; 
                  print_endline "\n Nothing has happened. Try again.";
                  solo_game_helper state_p1 state_AI)
