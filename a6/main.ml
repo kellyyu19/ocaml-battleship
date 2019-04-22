@@ -148,13 +148,12 @@ let rec play_game_helper state_p1 state_p2 turn =
        | _ -> raise Malformed)
 
     else 
-      print_text_grid state_p1 state_p2 false false;
-    (ANSITerminal.
-       (print_string [blue] 
-          ("\n The game has now started. \nTo fire, type \"fire [coordinate]\""^
-           " \nTo see how many ships you have sunk, type \"status\"" 
-           ^ if turn then "\n Player 1, make a move.\n >"
-           else "\n Player 2, make a move.\n >"))); 
+      (ANSITerminal.
+         (print_string [blue] 
+            ("\n The game has now started. \nTo fire, type \"fire [coordinate]\""^
+             " \nTo see how many ships you have sunk, type \"status\"" 
+             ^ if turn then "\n Player 1, make a move.\n >"
+             else "\n Player 2, make a move.\n >"))); 
 
     let userInput  = parse (read_line ()) in
     match userInput with 
