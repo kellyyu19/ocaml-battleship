@@ -291,7 +291,11 @@ let rec solo_game_helper state_p1 state_AI =
             then (print_endline "Player 1 has won."; exit 0)
             else
               let rec ai_fire_helper state_p1 state_AI = 
-                let new_state = fire (fire_AI_coords state_p1.current_grid state_p1.current_grid) state_p1 in
+                let decider = (state_AI.bombs_left > 0) && ((Random.int (int_of_float ((Unix.time ())) mod 10000)) mod 2)=0 in
+                let new_state = 
+                  if decider then
+                    fire (fire_AI_coords state_p1.current_grid state_p1.current_grid) state_p1
+                  else bomb (fire_AI_coords state_p1.current_grid state_p1.current_grid) state_p1 in
                 if (new_state = state_p1) 
                 then ai_fire_helper state_p1 state_AI
                 else (print_text_grid new_state state_AI true false; new_state) in 
