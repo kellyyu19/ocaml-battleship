@@ -274,22 +274,66 @@ let rec get_point (coord:Battleship.coordinate) (grid: Battleship.grid) (fullgri
   |[] -> failwith"coord does not exist in grid"
   |h::t -> if fst(h) = coord then h else get_point coord t fullgrid
 
-let pick_adjacent grid (point:Battleship.point) (rowcode: int) s : Battleship.coordinate = 
+let rec find_other_hit_coord (grid:Battleship.grid) (stalepoint_list:Battleship.coordinate list) (fullgrid:Battleship.grid)=
+  match grid with 
+  |[] -> Random.init (int_of_float ((Unix.time ())) mod 10000);
+    let coords = (generate_rnd_row (), generate_rnd_col ()) in print_endline("line 274");
+    if can_fire(get_point coords fullgrid fullgrid) then coords else find_other_hit_coord [] stalepoint_list  fullgrid 
+  |((r,c), Hit(s))::t when not(List.mem (r,c) stalepoint_list) -> (r,c)
+  |h::t -> find_other_hit_coord t stalepoint_list fullgrid
+
+let is_hit (point:Battleship.point) = 
+  match point with 
+  | ((r,c), Hit(s)) ->true
+  |_ -> false
+
+let rec pick_adjacent grid (point:Battleship.point) (rowcode: int) stale_list : Battleship.coordinate = 
+  (*if square above is hit, shoot below *)
   if 'a' <= (Char.chr (rowcode - 1)) && (Char.chr (rowcode - 1)) <= 'j' && 1 <= (snd (fst point)) && (snd (fst point))<= 10 &&
-     can_fire (get_point (Char.chr (rowcode - 1) , snd (fst point)) grid grid) then (Char.chr (rowcode - 1) , snd (fst point))
+     'a' <= (Char.chr (rowcode + 1)) && (Char.chr (rowcode + 1)) <= 'j' && 1 <= (snd (fst point)) && (snd (fst point))<= 10 &&
+     is_hit (get_point (Char.chr (rowcode - 1) , snd (fst point)) grid grid) && can_fire (get_point (Char.chr (rowcode + 1) , snd (fst point)) grid grid)
+  then (Char.chr (rowcode + 1) , snd (fst point)) 
+  (*if square  below is hit, shoot above *)
+  else if 'a' <= (Char.chr (rowcode - 1)) && (Char.chr (rowcode - 1)) <= 'j' && 1 <= (snd (fst point)) && (snd (fst point))<= 10 &&
+          'a' <= (Char.chr (rowcode + 1)) && (Char.chr (rowcode + 1)) <= 'j' && 1 <= (snd (fst point)) && (snd (fst point))<= 10 &&
+          is_hit (get_point (Char.chr (rowcode + 1) , snd (fst point)) grid grid) && can_fire (get_point (Char.chr (rowcode - 1) , snd (fst point)) grid grid)
+  then (Char.chr (rowcode - 1) , snd (fst point))  
+  (*if square left is hit, shoot right *)
+
+  else if 'a' <= (fst(fst point)) && (fst(fst point)) <= 'j' && 1 <= (snd (fst point)-1) && (snd (fst point)-1)<= 10  && 
+          'a' <= (fst(fst point)) && (fst(fst point)) <= 'j' && 1 <= (snd (fst point)+1) && (snd (fst point)+1)<= 10 &&
+          is_hit (get_point ((fst(fst point) , snd(fst point)-1)) grid grid) && can_fire (get_point ((fst(fst point) , snd(fst point)+1)) grid grid) 
+  then (fst(fst point),snd(fst point)+1) 
+  (*if square right is hit, shoot left *)
+
+  else if 'a' <= (fst(fst point)) && (fst(fst point)) <= 'j' && 1 <= (snd (fst point)-1) && (snd (fst point)-1)<= 10  && 
+          'a' <= (fst(fst point)) && (fst(fst point)) <= 'j' && 1 <= (snd (fst point)+1) && (snd (fst point)+1)<= 10 &&
+          is_hit (get_point ((fst(fst point) , snd(fst point)+1)) grid grid) && can_fire (get_point ((fst(fst point) , snd(fst point)-1)) grid grid) 
+  then (fst(fst point),snd(fst point)-1) 
+
+  (*else just check surrounding squares *)
+  else if 'a' <= (Char.chr (rowcode - 1)) && (Char.chr (rowcode - 1)) <= 'j' && 1 <= (snd (fst point)) && (snd (fst point))<= 10 &&
+          can_fire (get_point (Char.chr (rowcode - 1) , snd (fst point)) grid grid) then (Char.chr (rowcode - 1) , snd (fst point))
   else if 'a' <= (Char.chr (rowcode + 1)) && (Char.chr (rowcode + 1)) <= 'j' && 1 <= (snd (fst point)) && (snd (fst point))<= 10   && 
           can_fire (get_point (Char.chr (rowcode + 1) , snd (fst point)) grid grid) then (Char.chr (rowcode + 1) , snd (fst point)) 
+
+
+
   else if 'a' <= (fst(fst point)) && (fst(fst point)) <= 'j' && 1 <= (snd (fst point)-1) && (snd (fst point)-1)<= 10  && 
           can_fire (get_point ((fst(fst point) , snd(fst point)-1)) grid grid) then (fst(fst point) , snd(fst point)-1)
   else if 'a' <= (fst(fst point)) && (fst(fst point)) <= 'j' && 1 <= (snd (fst point)+1) && (snd (fst point)+1)<= 10  && 
           can_fire (get_point ((fst(fst point) , snd(fst point)+1)) grid grid) then (fst(fst point) , snd(fst point)+1)
-  else (generate_rnd_row (), generate_rnd_col ())
+
+  else let new_coord = find_other_hit_coord grid ((fst point)::stale_list) grid in 
+    pick_adjacent grid (get_point new_coord grid grid) (Char.code (fst new_coord)) stale_list
+
+
 
 
 let rec fire_AI_coords (fullgrid: Battleship.grid) (grid:Battleship.grid) : coordinate = 
   match grid with 
   |[] -> (generate_rnd_row (), generate_rnd_col ())
-  |((r,c), Hit(s))::t -> pick_adjacent fullgrid ((r,c), Hit(s)) (Char.code r) s
+  |((r,c), Hit(s))::t -> pick_adjacent fullgrid ((r,c), Hit(s)) (Char.code r) [] 
   |h::t -> fire_AI_coords fullgrid t 
 
 (** [can_bomb state] is whether or not the user can use a bomb *)
