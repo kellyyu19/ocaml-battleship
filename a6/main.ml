@@ -85,6 +85,7 @@ let print_text_grid state_p1 state_p2 ship_vis1 ship_vis2=
      (print_string [on_red] ("\nPlayer 2's Ships':" ^"\n"^
                              (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p2.current_grid) []) "" ship_vis2)^"\n\n"))); ()
 
+
 (** [play_game_helper state_p1 state_p2 turn] is the helper function for
     playing the actual game. It takes care of placing the ships, changing 
     the grid for when a coordinate is fired at, and ends the game when 
@@ -179,21 +180,21 @@ let rec play_game_helper state_p1 state_p2 turn =
              play_game_helper state_p1 state_p2 turn)
        else if turn 
        then (print_text_grid state_p1 new_state false false; 
-             print_endline "Shot fired."; 
+             print_endline "\n Shot fired."; 
              if winOrNot new_state.sunk_list 
-             then (print_endline "Player 1 has won."; exit 0)
+             then (print_endline "\n Player 1 has won."; exit 0)
              else play_game_helper state_p1 new_state (not turn))
        else if new_state = state_p1 
        then (print_text_grid state_p1 state_p2 false false; 
              print_endline "\n Nothing has happened. Try again.";
              play_game_helper state_p1 state_p2 turn)
        else print_text_grid new_state state_p2 false false; 
-       print_endline "Shot fired.";
+       print_endline "\n Shot fired.";
        if winOrNot new_state.sunk_list 
-       then (print_endline "Player 2 has won."; exit 0)
+       then (print_endline "\n Player 2 has won."; exit 0)
        else play_game_helper new_state state_p2 (not turn))
     | Status -> print_endline 
-                  ("You have sunk: " ^ 
+                  ("\n You have sunk: " ^ 
                    (string_of_int (if turn 
                                    then getAmountSunk state_p2.sunk_list 0 
                                    else getAmountSunk state_p1.sunk_list 0)));
@@ -211,7 +212,7 @@ let rec play_game_helper state_p1 state_p2 turn =
                play_game_helper state_p1 state_p2 turn)
          else if turn 
          then (print_text_grid state_p1 new_state false false; 
-               print_endline "Shot fired."; 
+               print_endline "\n Bomb fired."; 
                if winOrNot new_state.sunk_list 
                then (print_endline "Player 1 has won."; exit 0)
                else play_game_helper state_p1 new_state (not turn))
@@ -220,11 +221,11 @@ let rec play_game_helper state_p1 state_p2 turn =
                print_endline "\n Nothing has happened. Try again.";
                play_game_helper state_p1 state_p2 turn)
          else print_text_grid new_state state_p2 false false; 
-         print_endline "Shot fired.";
+         print_endline "\n Bomb fired.";
          if winOrNot new_state.sunk_list 
-         then (print_endline "Player 2 has won."; exit 0)
+         then (print_endline "\n Player 2 has won."; exit 0)
          else play_game_helper new_state state_p2 (not turn))
-      else (print_endline "You have no more bombs. Enter another command."); 
+      else (print_endline "\n You have no more bombs. Enter another command."); 
       if turn then 
         play_game_helper state_p1 state_p2 turn 
       else play_game_helper state_p2 state_p1 (not turn) 
@@ -238,6 +239,8 @@ let rec play_game_helper state_p1 state_p2 turn =
   | NotRight -> print_endline "\n These coordinates are equal. \n";
     play_game_helper state_p1 state_p2 turn
   | ShipHere -> print_endline "\n A ship is already placed here.\n";
+    play_game_helper state_p1 state_p2 turn
+  | Empty -> print_endline "\n That was not a valid command.";
     play_game_helper state_p1 state_p2 turn
 
 let rec solo_game_helper state_p1 state_AI = 
@@ -286,9 +289,9 @@ let rec solo_game_helper state_p1 state_AI =
                solo_game_helper state_p1 state_AI)
          else 
            (print_text_grid state_p1 new_state true false; 
-            print_endline "Shot fired."; 
+            print_endline "\n Shot fired."; 
             if winOrNot new_state.sunk_list 
-            then (print_endline "Player 1 has won."; exit 0)
+            then (print_endline "\n Player 1 has won."; exit 0)
             else
               let rec ai_fire_helper state_p1 state_AI = 
                 let decider = (state_AI.bombs_left > 0) && ((Random.int (int_of_float ((Unix.time ())) mod 10000)) mod 2)=0 in
@@ -301,7 +304,7 @@ let rec solo_game_helper state_p1 state_AI =
                 else (print_text_grid new_state state_AI true false; new_state) in 
               let new_p1 = ai_fire_helper state_p1 new_state in 
               if winOrNot new_p1.sunk_list 
-              then (print_endline "The AI has won."; exit 0)
+              then (print_endline "\n The AI has won."; exit 0)
               else solo_game_helper new_p1 new_state)
        | Bomb coord -> 
          if can_bomb state_AI then 
@@ -312,9 +315,9 @@ let rec solo_game_helper state_p1 state_AI =
                  solo_game_helper state_p1 state_AI)
            else 
              (print_text_grid state_p1 new_state true false; 
-              print_endline "Bomb fired."; 
+              print_endline "\n Bomb fired."; 
               if winOrNot new_state.sunk_list 
-              then (print_endline "Player 1 has won."; exit 0)
+              then (print_endline "\n Player 1 has won."; exit 0)
               else 
                 let rec ai_fire_helper state_p1 state_AI = 
                   let new_state = fire (fire_AI_coords state_p1.current_grid state_p1.current_grid) state_p1 in
@@ -323,9 +326,9 @@ let rec solo_game_helper state_p1 state_AI =
                   else (print_text_grid new_state state_AI true false; new_state) in 
                 let new_p1 = ai_fire_helper state_p1 new_state in 
                 if winOrNot new_p1.sunk_list 
-                then (print_endline "The AI has won."; exit 0)
+                then (print_endline "\n The AI has won."; exit 0)
                 else solo_game_helper new_p1 new_state)
-         else (print_endline "You have no more bombs. Enter another command."); 
+         else (print_endline "\n You have no more bombs. Enter another command."); 
          solo_game_helper state_p1 state_AI
        | Status -> 
          print_endline 
@@ -347,6 +350,8 @@ let rec solo_game_helper state_p1 state_AI =
   | NotRight -> print_endline "\n These coordinates can not form a ship. \n";
     solo_game_helper state_p1 state_AI
   | ShipHere -> print_endline "\n A ship is already placed here.\n";
+    solo_game_helper state_p1 state_AI
+  | Empty -> print_endline "\n That was not a valid command. \n";
     solo_game_helper state_p1 state_AI
 
 
