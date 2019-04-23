@@ -98,7 +98,7 @@ let rec play_game_helper state_p1 state_p2 turn =
   try 
     if (placing state_p1) then 
       (ANSITerminal.
-         (print_string [white] 
+         (print_string [default] 
             ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
             \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4. 
@@ -131,7 +131,7 @@ let rec play_game_helper state_p1 state_p2 turn =
 
     else if (placing state_p2) then
       (ANSITerminal.
-         (print_string [white] 
+         (print_string [default] 
             ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
             \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4.
@@ -163,7 +163,7 @@ let rec play_game_helper state_p1 state_p2 turn =
 
     else 
       (ANSITerminal.
-         (print_string [white] 
+         (print_string [default] 
             ("\n The game has now started. \nTo fire, type \"fire [coordinate]\""^
              "\nTo use a bomb, type \"bomb [coordinate]\" \nTo see how many ships you have sunk, type \"status\"" 
              ^ if turn then "\n Player 1, make a move.\n >"
@@ -242,12 +242,14 @@ let rec play_game_helper state_p1 state_p2 turn =
     play_game_helper state_p1 state_p2 turn
   | Empty -> print_endline "\n That was not a valid command.";
     play_game_helper state_p1 state_p2 turn
+  | Invalid_argument some -> print_endline "\n That was not a valid command. \n";
+    play_game_helper state_p1 state_p2 turn
 
 let rec solo_game_helper state_p1 state_AI = 
   try
     if (placing state_p1) then 
       (ANSITerminal.
-         (print_string [white] 
+         (print_string [default] 
             ("If you want to place all the ships randomly, type \"random\" , (you must use this before placing any ships.)
             \nTo place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
@@ -274,7 +276,7 @@ let rec solo_game_helper state_p1 state_AI =
        | _ -> raise Malformed)
     else 
       (ANSITerminal.
-         (print_string [white] 
+         (print_string [default] 
             ("\n The game has now started. \nTo fire, type \"fire [coordinate]"^
              "\" \nTo use a bomb, type \"bomb [coordinate]\" \nTo see how many ships you have sunk, type \"status\"" 
              ^ "\n Player 1, make a move.\n >")); 
@@ -288,8 +290,7 @@ let rec solo_game_helper state_p1 state_AI =
                print_endline "\n Nothing has happened. Try again.";
                solo_game_helper state_p1 state_AI)
          else 
-           (print_text_grid state_p1 new_state true false; 
-            print_endline "\n Shot fired."; 
+           (print_endline "\n Shot fired."; 
             if winOrNot new_state.sunk_list 
             then (print_endline "\n Player 1 has won."; exit 0)
             else
@@ -314,8 +315,7 @@ let rec solo_game_helper state_p1 state_AI =
                  print_endline "\n Nothing has happened. Try again.";
                  solo_game_helper state_p1 state_AI)
            else 
-             (print_text_grid state_p1 new_state true false; 
-              print_endline "\n Bomb fired."; 
+             (print_endline "\n Bomb fired."; 
               if winOrNot new_state.sunk_list 
               then (print_endline "\n Player 1 has won."; exit 0)
               else 
@@ -352,6 +352,8 @@ let rec solo_game_helper state_p1 state_AI =
   | ShipHere -> print_endline "\n A ship is already placed here.\n";
     solo_game_helper state_p1 state_AI
   | Empty -> print_endline "\n That was not a valid command. \n";
+    solo_game_helper state_p1 state_AI
+  | Invalid_argument some -> print_endline "\n That was not a valid command. \n";
     solo_game_helper state_p1 state_AI
 
 
