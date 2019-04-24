@@ -77,13 +77,13 @@ let cmdToCoordTwo command =
     states of player 1 and player 2.*)
 let print_text_grid state_p1 state_p2 ship_vis1 ship_vis2= 
   (ANSITerminal.
-     (print_string [on_blue] ("\nPlayer 1's Ships':" ^"\n"^
-                              (Textgrid.text_grid 
-                                 (Textgrid.sort_and_group_rows 
-                                    (List.rev Battleship.rows) (state_p1.current_grid) []) "" ship_vis1)^"\n\n"))); 
+     (print_string [white; on_blue] ("\nPlayer 1's Ships':" ^"\n"^
+                                     (Textgrid.text_grid 
+                                        (Textgrid.sort_and_group_rows 
+                                           (List.rev Battleship.rows) (state_p1.current_grid) []) "" ship_vis1)^"\n\n"))); 
   (ANSITerminal.                               
-     (print_string [on_red] ("\nPlayer 2's Ships':" ^"\n"^
-                             (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p2.current_grid) []) "" ship_vis2)^"\n\n"))); ()
+     (print_string [white; on_red] ("\nPlayer 2's Ships':" ^"\n"^
+                                    (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p2.current_grid) []) "" ship_vis2)^"\n\n"))); ()
 
 
 (** [play_game_helper state_p1 state_p2 turn] is the helper function for
