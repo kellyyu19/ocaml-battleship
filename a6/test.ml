@@ -56,7 +56,8 @@ let state_tests =
                                         (fun () -> place (init_cruiser) ('a',1) ('b',9) start_state));
     "TestPlacedNotRightCarrier" >:: (fun _ -> assert_raises(NotRight) 
                                         (fun () -> place (init_carrier) ('a',1) ('c',2) start_state));
-
+    (* "TestBombAtCarrier@a1_1" >:: (fun _ -> assert_equal (('a',1), Hit {name = Carrier; size = 2; hits = 1})
+                                     (List.hd (carrier_fired1.current_grid)) ); *)
   ]
 let make_command_tests  
     (name : string) 
