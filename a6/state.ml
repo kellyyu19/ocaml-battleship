@@ -40,6 +40,9 @@ exception OutOfBounds
     because they are neither part of the same column nor the same row. *)
 exception NotRight
 
+(** TimeOut is raised when it is no longer practical for the AI to continue thinking *)
+exception TimeOut
+
 (** [place ship coordOne coordTwo state] is the new state of the game when 
     [ship] is placed in the grid given by [state]. 
     Raises: NotRight is coordinates are incompatible. 
@@ -292,8 +295,9 @@ let is_hit (point:Battleship.point) =
   | ((r,c), Hit(s)) ->true
   |_ -> false
 
-let rec pick_adjacent grid (point:Battleship.point) (rowcode: int) stale_list : Battleship.coordinate = 
-  (*if square above is hit, shoot below *)
+let rec pick_adjacent grid (point:Battleship.point) (rowcode: int) stale_list time : Battleship.coordinate = 
+  if time -. (Unix.time ()) > 3.0  then (generate_rnd_row (), generate_rnd_col ()) else 
+    (*if square above is hit, shoot below *)
   if 'a' <= (Char.chr (rowcode - 1)) && (Char.chr (rowcode - 1)) <= 'j' && 1 <= (snd (fst point)) && (snd (fst point))<= 10 &&
      'a' <= (Char.chr (rowcode + 1)) && (Char.chr (rowcode + 1)) <= 'j' && 1 <= (snd (fst point)) && (snd (fst point))<= 10 &&
      is_hit (get_point (Char.chr (rowcode - 1) , snd (fst point)) grid grid) && can_fire (get_point (Char.chr (rowcode + 1) , snd (fst point)) grid grid)
@@ -330,14 +334,15 @@ let rec pick_adjacent grid (point:Battleship.point) (rowcode: int) stale_list : 
           can_fire (get_point ((fst(fst point) , snd(fst point)+1)) grid grid) then (fst(fst point) , snd(fst point)+1)
 
   else let new_coord = find_other_hit_coord grid ((fst point)::stale_list) grid in 
-    pick_adjacent grid (get_point new_coord grid grid) (Char.code (fst new_coord)) stale_list
+    pick_adjacent grid (get_point new_coord grid grid) (Char.code (fst new_coord)) stale_list time
 
 
-let rec fire_AI_coords (fullgrid: Battleship.grid) (grid:Battleship.grid) : coordinate = 
+let rec fire_AI_coords (fullgrid: Battleship.grid) (grid:Battleship.grid) time : coordinate = 
   match grid with 
   |[] -> (generate_rnd_row (), generate_rnd_col ())
-  |((r,c), Hit(s))::t -> pick_adjacent fullgrid ((r,c), Hit(s)) (Char.code r) [] 
-  |h::t -> fire_AI_coords fullgrid t 
+  |((r,c), Hit(s))::t -> pick_adjacent fullgrid ((r,c), Hit(s)) (Char.code r) [] time
+  |h::t -> fire_AI_coords fullgrid t time
+
 
 (** [can_bomb state] is whether or not the user can use a bomb *)
 let can_bomb state = 
