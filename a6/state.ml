@@ -204,14 +204,19 @@ let rec getAmountSunk lst accum =
   | [] -> accum
   | h::t -> getAmountSunk t (accum + 1) 
 
+(** [generate_0_1 ()] generates a random int from 0-1 inclusive. *)
 let generate_0_1 () = 
   Random.int 2
+
+(** [generate_0_3 ()] generates a random int from 0-3 inclusive. *)
 let generate_0_3 () = 
   Random.int 4
 
+(** [generate_rnd_row ()] is a random char representing a row. *)
 let generate_rnd_row () = 
   List.nth (Battleship.rows) (Random.int 10) 
 
+(** [generate_rnd_row ()] is a random int representing a column. *)
 let generate_rnd_col () = 
   List.nth (Battleship.columns) (Random.int 10)
 
@@ -328,8 +333,6 @@ let rec pick_adjacent grid (point:Battleship.point) (rowcode: int) stale_list : 
     pick_adjacent grid (get_point new_coord grid grid) (Char.code (fst new_coord)) stale_list
 
 
-
-
 let rec fire_AI_coords (fullgrid: Battleship.grid) (grid:Battleship.grid) : coordinate = 
   match grid with 
   |[] -> (generate_rnd_row (), generate_rnd_col ())
@@ -340,6 +343,10 @@ let rec fire_AI_coords (fullgrid: Battleship.grid) (grid:Battleship.grid) : coor
 let can_bomb state = 
   if state.bombs_left <= 0 then false else true
 
+(** [get_bomb_coords coord] is a list of coordinates that represents the
+    coordinates to be fired at in a single move when bomb is called. 
+    The list of coordinates are a cross, with the center point being the 
+    [coord]. *)
 let get_bomb_coords coord : coordinate list = 
   let row = match coord with 
     | (r,c) -> r in 
@@ -367,11 +374,16 @@ let get_bomb_coords coord : coordinate list =
   then [coord; (Char.chr (rowASCII-1), col); (row, col+1)]
   else [coord; (Char.chr (rowASCII-1), col); (row, col-1)]
 
+(** [bomb_helper coordsList currentState] is a helper function for [bomb] 
+    that is the state of the game when a bomb is used. *)
 let rec bomb_helper coordsList currentState =  
   match coordsList with 
   | [] -> {currentState with bombs_left=currentState.bombs_left-1}
   | h::t -> bomb_helper t (fire h currentState)
 
+(** [bomb coord currentState] is the new game state resulting from bombing at 
+     the given coordinate. It fires at the [coord] and the surrounding
+     points adjacent to it. *)
 let bomb coord currentState= 
   let coordsList = get_bomb_coords coord in 
   bomb_helper coordsList currentState
