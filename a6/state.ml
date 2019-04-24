@@ -40,9 +40,6 @@ exception OutOfBounds
     because they are neither part of the same column nor the same row. *)
 exception NotRight
 
-(** TimeOut is raised when it is no longer practical for the AI to continue thinking *)
-exception TimeOut
-
 (** [place ship coordOne coordTwo state] is the new state of the game when 
     [ship] is placed in the grid given by [state]. 
     Raises: NotRight is coordinates are incompatible. 
