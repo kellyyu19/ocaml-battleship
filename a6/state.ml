@@ -282,7 +282,7 @@ let rec get_point (coord:Battleship.coordinate) (grid: Battleship.grid) (fullgri
 let rec find_other_hit_coord (grid:Battleship.grid) (stalepoint_list:Battleship.coordinate list) (fullgrid:Battleship.grid)=
   match grid with 
   |[] -> Random.init (int_of_float ((Unix.time ())) mod 10000);
-    let coords = (generate_rnd_row (), generate_rnd_col ()) in print_endline("line 274");
+    let coords = (generate_rnd_row (), generate_rnd_col ()) in
     if can_fire(get_point coords fullgrid fullgrid) then coords else find_other_hit_coord [] stalepoint_list  fullgrid 
   |((r,c), Hit(s))::t when not(List.mem (r,c) stalepoint_list) -> (r,c)
   |h::t -> find_other_hit_coord t stalepoint_list fullgrid
