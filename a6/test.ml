@@ -22,7 +22,9 @@ let battleship_fired = fire('e', 3) carrier_fired1
 let missed_fire = fire ('f', 10) battleship_fired
 let fire_at_same_missed_point = fire ('f', 10) missed_fire
 let fire_at_same_hit_point = fire ('e', 3) fire_at_same_missed_point
-let bomb_at_a1 = bomb ('a',1) battleship_placed
+let bomb_at_a1 = bomb ('a',1) init_state
+let bomb_at_d1 = bomb ('d',1) battleship_placed
+let bomb_at_f5 = bomb ('f',5) init_state
 
 let state_tests = 
   [
@@ -56,8 +58,30 @@ let state_tests =
                                         (fun () -> place (init_cruiser) ('a',1) ('b',9) start_state));
     "TestPlacedNotRightCarrier" >:: (fun _ -> assert_raises(NotRight) 
                                         (fun () -> place (init_carrier) ('a',1) ('c',2) start_state));
-    (* "TestBombAtCarrier@a1_1" >:: (fun _ -> assert_equal (('a',1), Hit {name = Carrier; size = 2; hits = 1})
-                                     (List.hd (carrier_fired1.current_grid)) ); *)
+    "TestBombEmpty@a1_1" >:: (fun _ -> assert_equal (('a',1), Miss)
+                                 (get_point ('a', 1) bomb_at_a1.current_grid));
+    "TestBombEmpty@a1_2" >:: (fun _ -> assert_equal (('a',2), Miss)
+                                 (get_point ('a', 2) bomb_at_a1.current_grid));                                
+    "TestBombEmpty@a1_3" >::  (fun _ -> assert_equal (('b',1), Miss)
+                                  (get_point ('b', 1) bomb_at_a1.current_grid));   
+    "TestBombPlaced@d1_1" >:: (fun _ -> assert_equal (('d',1), Hit {name=Cruiser; size=3; hits=2})
+                                  (get_point ('d', 1) bomb_at_d1.current_grid));   
+    "TestBombPlaced@d1_2" >:: (fun _ -> assert_equal (('d',2), Hit {name=Cruiser; size=3; hits=2})
+                                  (get_point ('d', 2) bomb_at_d1.current_grid)); 
+    "TestBombPlaced@d1_3" >:: (fun _ -> assert_equal (('c',1), Hit {name=Submarine; size=3; hits=1})
+                                  (get_point ('c', 1) bomb_at_d1.current_grid)); 
+    "TestBombPlaced@d1_4" >:: (fun _ -> assert_equal (('e',1), Hit {name=Battleship; size=4; hits=1})
+                                  (get_point ('e', 1) bomb_at_d1.current_grid)); 
+    "TestBombPlaced@f5_1" >:: (fun _ -> assert_equal (('f',5), Miss)
+                                  (get_point ('f', 5) bomb_at_f5.current_grid)); 
+    "TestBombPlaced@f5_2" >:: (fun _ -> assert_equal (('f',6), Miss)
+                                  (get_point ('f', 6) bomb_at_f5.current_grid));       
+    "TestBombPlaced@f5_3" >:: (fun _ -> assert_equal (('f',4), Miss)
+                                  (get_point ('f', 4) bomb_at_f5.current_grid));   
+    "TestBombPlaced@f5_4" >:: (fun _ -> assert_equal (('e',5), Miss)
+                                  (get_point ('e', 5) bomb_at_f5.current_grid));
+    "TestBombPlaced@f5_5" >:: (fun _ -> assert_equal (('g',5), Miss)
+                                  (get_point ('g', 5) bomb_at_f5.current_grid));                       
   ]
 let make_command_tests  
     (name : string) 
