@@ -27,7 +27,7 @@ let bomb_at_a1 = bomb ('a',1) battleship_placed
 let state_tests = 
   [
     "testFireAtCarrier" >:: (fun _ -> assert_equal (('a', 1), Hit {name = Carrier; size = 2; hits = 1})
-                                (List.hd (carrier_fired1.current_grid)) );
+                                (get_point ('a', 1) carrier_fired1.current_grid)) ;
     "testFireAtMiddleOfBattleship" >:: (fun _ -> assert_equal (('e', 3), Hit {name = Battleship; size = 4; hits = 1})
                                            (get_point ('e', 3) battleship_fired.current_grid) );
     "testEmptyPoint" >:: (fun _ -> assert_equal (('f', 10), Miss)
