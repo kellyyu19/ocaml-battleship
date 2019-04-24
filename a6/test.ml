@@ -22,6 +22,7 @@ let battleship_fired = fire('e', 3) carrier_fired1
 let missed_fire = fire ('f', 10) battleship_fired
 let fire_at_same_missed_point = fire ('f', 10) missed_fire
 let fire_at_same_hit_point = fire ('e', 3) fire_at_same_missed_point
+let bomb_at_a1 = bomb ('a',1) battleship_placed
 
 let state_tests = 
   [
