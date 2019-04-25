@@ -90,13 +90,17 @@ let print_text_grid state_p1 state_p2 ship_vis1 ship_vis2=
 
 
 (** [play_game_helper state_p1 state_p2 turn] is the helper function for
-    playing the actual game. It takes care of placing the ships, changing 
+    playing the versus game. It takes care of placing the ships, changing 
     the grid for when a coordinate is fired at, and ends the game when 
     all ships have been sunk. 
-    Raises: [Malformed] if the inputted command is invalid. 
+    Raises: (Note that these are never truly raised by play_game_helper, but are 
+    actually caught and handled within. The errors are described here for ease of 
+    reading our code.)
+            [Malformed] if the inputted command is invalid. 
             [OutOfBounds] if the given coordinates is out of bounds. 
             [NotRight] if the given coordinates for placing are equal. 
-            [ShipHere] if a ship is already placed at given coordinates*)
+            [ShipHere] if a ship is already placed at given coordinates
+            [Invalid_argument] if the given coordinate was of unrecognized form. *)
 let rec play_game_helper state_p1 state_p2 turn =  
   try 
     if (placing state_p1) then 
@@ -153,7 +157,7 @@ let rec play_game_helper state_p1 state_p2 turn =
        | Quit -> print_endline "Goodbye!"; exit 0
        | Fire coord -> raise Malformed
        | Status -> raise Malformed
-       | PlaceRandom -> Random.init (int_of_float ((Unix.time ())) mod 10000);
+       | PlaceRandom -> Random.init (int_of_float ((Unix.time ())) mod 10000); 
          if (List.length state_p2.ships_on_grid )>0 then raise Malformed else 
            let new_state = state_builder_AI state_p2 state_p2.ship_list in 
            print_text_grid state_p1 new_state false true;
@@ -258,6 +262,11 @@ let rec play_game_helper state_p1 state_p2 turn =
   | Invalid_argument some -> print_endline "\n That was not a valid command. \n";
     play_game_helper state_p1 state_p2 turn
 
+(** [solo_game_helper state_p1 state_AI] is the helper function for
+    playing the solo game. It takes care of placing the ships, changing 
+    the grid for when a coordinate is fired/bombed at, and ends the game when 
+    all ships have been sunk. It also executes AI decisions immediately following
+    a successful user input. *)
 let rec solo_game_helper state_p1 state_AI = 
   try
     if (placing state_p1) then 
