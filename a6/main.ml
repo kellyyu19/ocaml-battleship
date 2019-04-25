@@ -77,13 +77,16 @@ let cmdToCoordTwo command =
     states of player 1 and player 2.*)
 let print_text_grid state_p1 state_p2 ship_vis1 ship_vis2= 
   (ANSITerminal.
-     (print_string [white; on_blue] ("\nPlayer 1's Ships':" ^"\n"^
-                                     (Textgrid.text_grid 
-                                        (Textgrid.sort_and_group_rows 
-                                           (List.rev Battleship.rows) (state_p1.current_grid) []) "" ship_vis1)^"\n\n"))); 
+     (print_string [white; on_blue] 
+        ("\nPlayer 1's Ships':" ^"\n"^
+         (Textgrid.text_grid 
+            (Textgrid.sort_and_group_rows 
+               (List.rev Battleship.rows) (state_p1.current_grid) []) "" ship_vis1)^"\n\n"))); 
   (ANSITerminal.                               
-     (print_string [white; on_red] ("\nPlayer 2's Ships':" ^"\n"^
-                                    (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p2.current_grid) []) "" ship_vis2)^"\n\n"))); ()
+     (print_string [white; on_red] 
+        ("\nPlayer 2's Ships':" ^
+         "\n"^ (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) 
+                                      (state_p2.current_grid) []) "" ship_vis2)^"\n\n"))); ()
 
 
 (** [play_game_helper state_p1 state_p2 turn] is the helper function for
@@ -99,11 +102,15 @@ let rec play_game_helper state_p1 state_p2 turn =
     if (placing state_p1) then 
       (ANSITerminal.
          (print_string [default] 
-            ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
+            ("To place a ship, type \"place [ship name] [starting coordinate]"^
+             " [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
-            \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4. 
-            \nIf you want to place randomly, type \"random\", (you must use this before placing any ships.)
-            \nPlayer 1, please place your next ship. Ships remaining: " ^ queue state_p1 ^ "\n\n>"));
+            \nCarrier has size 2, Destroyer has size 2, Submarine has size 3,"^
+             " Cruiser has size 3, and Battleship has size 4. 
+            \nIf you want to place randomly, type \"random\", (you must use "^
+             "this before placing any ships.)
+            \nPlayer 1, please place your next ship. Ships remaining: " ^ 
+             queue state_p1 ^ "\n\n>"));
        let command = parse (read_line ()) in 
        match command with 
        | Quit -> print_endline "Goodbye!"; exit 0
@@ -115,7 +122,6 @@ let rec play_game_helper state_p1 state_p2 turn =
            print_text_grid new_state state_p2 true false; 
            print_endline "\n\n\n\n\n\n\n\n\n\n";
            print_text_grid new_state state_p2 false false; 
-
            play_game_helper new_state state_p2 turn
        | Place ship -> 
          let ship = cmdToShip command in 
@@ -133,11 +139,15 @@ let rec play_game_helper state_p1 state_p2 turn =
     else if (placing state_p2) then
       (ANSITerminal.
          (print_string [default] 
-            ("To place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
+            ("To place a ship, type \"place [ship name] [starting coordinate]"^
+             " [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
-            \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4.
-            \nIf you want to place randomly, type \"random\", (you must use this before placing any ships.)
-            \nPlayer 2, please place your next ship. Ships remaining: " ^ queue state_p2 ^ "\n\n>"));
+            \nCarrier has size 2, Destroyer has size 2, Submarine has size 3,"^
+             " Cruiser has size 3, and Battleship has size 4.
+            \nIf you want to place randomly, type \"random\", (you must use "^
+             "this before placing any ships.)
+            \nPlayer 2, please place your next ship. Ships remaining: " ^ 
+             queue state_p2 ^ "\n\n>"));
        let command = parse (read_line ()) in 
        match command with 
        | Quit -> print_endline "Goodbye!"; exit 0
@@ -167,7 +177,8 @@ let rec play_game_helper state_p1 state_p2 turn =
       (ANSITerminal.
          (print_string [default] 
             ("\n The game has now started. \nTo fire, type \"fire [coordinate]\""^
-             "\nTo use a bomb, type \"bomb [coordinate]\" \nTo see how many ships you have sunk, type \"status\"" 
+             "\nTo use a bomb, type \"bomb [coordinate]\" \nTo see how many"^
+             " ships you have sunk, type \"status\"" 
              ^ if turn then "\n Player 1, make a move.\n >"
              else "\n Player 2, make a move.\n >"))); 
 
@@ -252,11 +263,15 @@ let rec solo_game_helper state_p1 state_AI =
     if (placing state_p1) then 
       (ANSITerminal.
          (print_string [default] 
-            ("If you want to place all the ships randomly, type \"random\" , (you must use this before placing any ships.)
-            \nTo place a ship, type \"place [ship name] [starting coordinate] [ending coordinate]\" 
+            ("If you want to place all the ships randomly, type \"random\" ,"^
+             " (you must use this before placing any ships.)
+            \nTo place a ship, type \"place [ship name] [starting coordinate]"^
+             " [ending coordinate]\" 
             \nFor example, \"place carrier a1 a2\"
-            \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, Cruiser has size 3, and Battleship has size 4. 
-            \nPlayer 1, please place your next ship. Ships remaining: " ^ queue state_p1 ^ "\n\n>"));
+            \nCarrier has size 2, Destroyer has size 2, Submarine has size 3, "^
+             "Cruiser has size 3, and Battleship has size 4. 
+            \nPlayer 1, please place your next ship. Ships remaining: " ^ 
+             queue state_p1 ^ "\n\n>"));
        let command = parse (read_line ()) in 
        match command with 
        | Quit -> print_endline "Goodbye!"; exit 0
@@ -280,7 +295,8 @@ let rec solo_game_helper state_p1 state_AI =
       (ANSITerminal.
          (print_string [default] 
             ("\n The game has now started. \nTo fire, type \"fire [coordinate]"^
-             "\" \nTo use a bomb, type \"bomb [coordinate]\" \nTo see how many ships you have sunk, type \"status\"" 
+             "\" \nTo use a bomb, type \"bomb [coordinate]\" \nTo see how many"^
+             " ships you have sunk, type \"status\"" 
              ^ "\n Player 1, make a move.\n >")); 
 
        let userInput  = parse (read_line ()) in
@@ -303,15 +319,16 @@ let rec solo_game_helper state_p1 state_AI =
                                 mod 2)=0 in
                  let new_state = 
                    if decider then
-                     fire (fire_AI_coords 
-                             state_p1.current_grid state_p1.current_grid (Unix.time ())) 
+                     fire (fire_AI_coords state_p1.current_grid 
+                             state_p1.current_grid (Unix.time ())) 
                        state_p1
-                   else bomb (fire_AI_coords 
-                                state_p1.current_grid state_p1.current_grid (Unix.time ())) 
+                   else bomb (fire_AI_coords state_p1.current_grid 
+                                state_p1.current_grid (Unix.time ())) 
                        state_p1 in
                  if (new_state = state_p1) 
-                 then ai_fire_helper state_p1 state_AI
-                 else (print_text_grid new_state state_AI true false; print_endline "\n Shot fired."; new_state) in 
+                 then (ai_fire_helper state_p1 state_AI )
+                 else (print_text_grid new_state state_AI true false;
+                       print_endline "\n Shot fired."; new_state) in 
                let new_p1 = ai_fire_helper state_p1 new_state in 
                if winOrNot new_p1.sunk_list 
                then (print_endline "\n The AI has won."; exit 0)
@@ -329,7 +346,8 @@ let rec solo_game_helper state_p1 state_AI =
               then (print_endline "\n Player 1 has won."; exit 0)
               else 
                 let rec ai_fire_helper state_p1 state_AI = 
-                  let new_state = fire (fire_AI_coords state_p1.current_grid state_p1.current_grid (Unix.time())) state_p1 in
+                  let new_state = fire (fire_AI_coords state_p1.current_grid 
+                                          state_p1.current_grid (Unix.time())) state_p1 in
                   if (new_state = state_p1) 
                   then ai_fire_helper state_p1 state_AI
                   else (print_text_grid new_state state_AI true false; new_state) in 
