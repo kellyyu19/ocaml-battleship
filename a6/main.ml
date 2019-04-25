@@ -77,13 +77,19 @@ let cmdToCoordTwo command =
     states of player 1 and player 2.*)
 let print_text_grid state_p1 state_p2 ship_vis1 ship_vis2= 
   (ANSITerminal.
-     (print_string [white; on_blue] ("\nPlayer 1's Ships':" ^"\n"^
-                                     (Textgrid.text_grid 
-                                        (Textgrid.sort_and_group_rows 
-                                           (List.rev Battleship.rows) (state_p1.current_grid) []) "" ship_vis1)^"\n\n"))); 
+     (print_string [white; on_blue]
+        ("\nPlayer 1's Ships':" ^"\n"^
+         (Textgrid.text_grid 
+            (Textgrid.sort_and_group_rows 
+               (List.rev Battleship.rows) 
+               (state_p1.current_grid) []) "" ship_vis1)^"\n\n"))); 
   (ANSITerminal.                               
-     (print_string [white; on_red] ("\nPlayer 2's Ships':" ^"\n"^
-                                    (Textgrid.text_grid (Textgrid.sort_and_group_rows (List.rev Battleship.rows) (state_p2.current_grid) []) "" ship_vis2)^"\n\n"))); ()
+     (print_string [white; on_red] 
+        ("\nPlayer 2's Ships':" ^"\n"^
+         (Textgrid.text_grid 
+            (Textgrid.sort_and_group_rows 
+               (List.rev Battleship.rows) 
+               (state_p2.current_grid) []) "" ship_vis2)^"\n\n"))); ()
 
 
 (** [play_game_helper state_p1 state_p2 turn] is the helper function for
@@ -306,12 +312,14 @@ let rec solo_game_helper state_p1 state_AI =
                      fire (fire_AI_coords 
                              state_p1.current_grid state_p1.current_grid (Unix.time ())) 
                        state_p1
-                   else bomb (fire_AI_coords 
-                                state_p1.current_grid state_p1.current_grid (Unix.time ())) 
+                   else bomb 
+                       (fire_AI_coords 
+                          state_p1.current_grid state_p1.current_grid (Unix.time ())) 
                        state_p1 in
                  if (new_state = state_p1) 
                  then ai_fire_helper state_p1 state_AI
-                 else (print_text_grid new_state state_AI true false; print_endline "\n Shot fired."; new_state) in 
+                 else (print_text_grid new_state state_AI true false;
+                       print_endline "\n Shot fired."; new_state) in 
                let new_p1 = ai_fire_helper state_p1 new_state in 
                if winOrNot new_p1.sunk_list 
                then (print_endline "\n The AI has won."; exit 0)
